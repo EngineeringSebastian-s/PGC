@@ -1,0 +1,11 @@
+.gradle/
+build/
+bin/
+node_modules/
+.next/
+out/
+graphify-out/
+.idea/
+.kotlin/
+*.iml
+tsconfig.tsbuildinfo
