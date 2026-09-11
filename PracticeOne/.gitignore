@@ -1,6 +1,7 @@
 .gradle/
 build/
 bin/
+obj/
 node_modules/
 .next/
 out/
@@ -9,3 +10,8 @@ graphify-out/
 .kotlin/
 *.iml
 tsconfig.tsbuildinfo
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dist/

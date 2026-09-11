@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PlaylistManager/PlaylistManager.csproj" />
+    <Project Path="src/PlaylistManager.Cli/PlaylistManager.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PlaylistManager.Tests/PlaylistManager.Tests.csproj" />
+  </Folder>
+</Solution>
