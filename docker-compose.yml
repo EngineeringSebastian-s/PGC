@@ -1,22 +1,6 @@
-# Entorno completo del repo en contenedores.
-#
-# Objetivo: que cualquier máquina con Docker pueda correr las ocho suítes sin
-# instalar ni un SDK. Cada servicio usa la imagen oficial de su lenguaje.
-#
-#   docker compose run --rm go          # una suite suelta
-#   docker compose up guia-web          # la guía en http://localhost:43141
-#   .\scripts\docker-correr-todo.ps1    # las ocho, con resumen
-#
-# Sobre los volúmenes anónimos (`- /app/node_modules`, `- /app/target`, ...):
-# enmascaran las carpetas de build del host. Sin eso, el contenedor Linux
-# levantaría los binarios nativos compilados para Windows y fallaría.
-
 name: pgc
 
 services:
-
-  # ---------------------------------------------------------------- punto 3
-
   csharp:
     image: mcr.microsoft.com/dotnet/sdk:10.0
     working_dir: /app
@@ -81,11 +65,6 @@ services:
       - go-build:/root/.cache/go-build
     command: go test -v ./...
 
-  # ---------------------------------------------------------------- puntos 1 y 2
-
-  # En Linux, Gradle no sufre el error "Unable to establish loopback connection"
-  # que bloquea a estos dos proyectos en Windows. Se usa el gradle de la imagen
-  # en vez de ./gradlew para no re-descargar la distribución en cada máquina.
   java:
     image: gradle:8.14.3-jdk21
     working_dir: /app
@@ -106,10 +85,6 @@ services:
       - /app/.gradle
       - /app/.kotlin
     command: gradle test --console=plain --no-daemon
-
-  # ---------------------------------------------------------------- demos con UI
-
-  # Servicios de larga duración: se levantan con `docker compose up <nombre>`.
 
   guia-web:
     image: node:22-alpine
