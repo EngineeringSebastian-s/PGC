@@ -31,7 +31,7 @@ $env:JAVA_HOME = "C:\Program Files\Java\Java21"
 En Linux/macOS: `./gradlew test`. El reporte HTML queda en `build/reports/tests/test/index.html`.
 
 > ⚠️ **Si falla con `Unable to establish loopback connection`**, ver
-> [la guía de exposición](../GUIA-EXPOSICION.md#problema-conocido-gradle-no-arranca-en-esta-máquina).
+> [la guía de exposición](../GUIDE.md#problema-conocido-gradle-no-arranca-en-esta-máquina).
 
 ## Qué demuestra cada test
 

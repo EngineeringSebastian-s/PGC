@@ -70,7 +70,7 @@ Composer se instala con el instalador oficial (ver [`PracticeOne/crud-tdd/php/RE
 
 ## Para la exposición
 
-👉 **[PracticeOne/GUIA-EXPOSICION.md](PracticeOne/GUIA-EXPOSICION.md)** — guion paso a paso: qué
+👉 **[PracticeOne/GUIA-EXPOSICION.md](PracticeOne/GUIDE.md)** — guion paso a paso: qué
 mostrar, en qué orden, qué comandos correr, qué decir en cada concepto y qué hacer si algo falla en vivo.
 
 ## Estructura
