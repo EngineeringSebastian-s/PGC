@@ -24,7 +24,9 @@ fn deberia_incrementar_id_al_crear_varios_videojuegos() {
     let primero = repositorio
         .crear("Hollow Knight", "Team Cherry", 2017)
         .unwrap();
-    let segundo = repositorio.crear("Celeste", "Maddy Makes Games", 2018).unwrap();
+    let segundo = repositorio
+        .crear("Celeste", "Maddy Makes Games", 2018)
+        .unwrap();
 
     assert!(segundo.id > primero.id);
 }
@@ -70,8 +72,12 @@ fn deberia_retornar_lista_vacia_si_no_hay_videojuegos() {
 #[test]
 fn deberia_retornar_todos_los_videojuegos_registrados() {
     let mut repositorio = repositorio_vacio();
-    repositorio.crear("Hollow Knight", "Team Cherry", 2017).unwrap();
-    repositorio.crear("Celeste", "Maddy Makes Games", 2018).unwrap();
+    repositorio
+        .crear("Hollow Knight", "Team Cherry", 2017)
+        .unwrap();
+    repositorio
+        .crear("Celeste", "Maddy Makes Games", 2018)
+        .unwrap();
 
     assert_eq!(repositorio.obtener_todos().len(), 2);
 }
@@ -112,7 +118,10 @@ fn deberia_retornar_error_al_actualizar_con_titulo_vacio() {
     let resultado = repositorio.actualizar(creado.id, Some(""), None, None, None);
 
     assert!(matches!(resultado, Err(ErrorCatalogo::DatosInvalidos(_))));
-    assert_eq!(repositorio.obtener_por_id(creado.id).unwrap().titulo, "Hollow Knight");
+    assert_eq!(
+        repositorio.obtener_por_id(creado.id).unwrap().titulo,
+        "Hollow Knight"
+    );
 }
 
 #[test]
@@ -145,7 +154,9 @@ fn deberia_no_afectar_otros_videojuegos_al_eliminar_uno() {
     let primero = repositorio
         .crear("Hollow Knight", "Team Cherry", 2017)
         .unwrap();
-    let segundo = repositorio.crear("Celeste", "Maddy Makes Games", 2018).unwrap();
+    let segundo = repositorio
+        .crear("Celeste", "Maddy Makes Games", 2018)
+        .unwrap();
 
     repositorio.eliminar(primero.id).unwrap();
 
