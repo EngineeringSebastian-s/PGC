@@ -11,15 +11,15 @@ validaciones, construido test a test.
 
 ## Comparativa
 
-| Lenguaje               | Framework de test        | Tema del CRUD           | Tests | Cómo se prueba el error |
-|------------------------|--------------------------|-------------------------|-------|-------------------------|
-| C# / .NET              | xUnit + FluentAssertions | Playlist de canciones   | 17    | `.Should().Throw<T>()`  |
-| Python                 | pytest                   | Colección de vinilos    | 16    | `pytest.raises`         |
-| TypeScript / React     | Vitest + Testing Library | Plantas de jardín       | 21    | `expect(...).toThrow`   |
-| PHP                    | PHPUnit                  | Biblioteca de libros    | 18    | `expectException`       |
-| Rust                   | `cargo test` (built-in)  | Catálogo de videojuegos | 18    | `assert_eq!` sobre `Result` |
-| Go                     | `go test` (built-in)     | Catálogo de películas   | 21    | `errors.Is` sobre el `error` devuelto |
-|                        |                          | **Total**               | **111** |                       |
+| Lenguaje           | Framework de test        | Tema del CRUD           | Tests   | Cómo se prueba el error               |
+|--------------------|--------------------------|-------------------------|---------|---------------------------------------|
+| C# / .NET          | xUnit + FluentAssertions | Playlist de canciones   | 17      | `.Should().Throw<T>()`                |
+| Python             | pytest                   | Colección de vinilos    | 16      | `pytest.raises`                       |
+| TypeScript / React | Vitest + Testing Library | Plantas de jardín       | 21      | `expect(...).toThrow`                 |
+| PHP                | PHPUnit                  | Biblioteca de libros    | 18      | `expectException`                     |
+| Rust               | `cargo test` (built-in)  | Catálogo de videojuegos | 18      | `assert_eq!` sobre `Result`           |
+| Go                 | `go test` (built-in)     | Catálogo de películas   | 21      | `errors.Is` sobre el `error` devuelto |
+|                    |                          | **Total**               | **111** |                                       |
 
 ## El ejercicio, en una línea
 
@@ -37,14 +37,14 @@ Esa repetición es deliberada: permite abrir dos lenguajes al lado y comparar ca
 
 ## Cómo correr cada uno
 
-| Proyecto | Carpeta | Instalar | Probar | Demo manual |
-|----------|---------|----------|--------|-------------|
-| C#       | [`csharp-dotnet/`](csharp-dotnet) | `dotnet restore` | `dotnet test` | `dotnet run --project src/PlaylistManager.Cli` |
-| Python   | [`python/`](python) | `pip install -r requirements.txt` | `pytest -v` | `python -m src.main` |
-| React    | [`javascript-react/`](javascript-react) | `npm install` | `npm test` | `npm run dev` |
-| PHP      | [`php/`](php) | `composer install` | `composer test` | `php cli.php` |
-| Rust     | [`rust/`](rust) | (nada) | `cargo test` | `cargo run` |
-| Go       | [`go/`](go) | (nada) | `go test ./...` | `go run ./cmd/cli` |
+| Proyecto | Carpeta                                 | Instalar                          | Probar          | Demo manual                                    |
+|----------|-----------------------------------------|-----------------------------------|-----------------|------------------------------------------------|
+| C#       | [`csharp-dotnet/`](csharp-dotnet)       | `dotnet restore`                  | `dotnet test`   | `dotnet run --project src/PlaylistManager.Cli` |
+| Python   | [`python/`](python)                     | `pip install -r requirements.txt` | `pytest -v`     | `python -m src.main`                           |
+| React    | [`javascript-react/`](javascript-react) | `npm install`                     | `npm test`      | `npm run dev`                                  |
+| PHP      | [`php/`](php)                           | `composer install`                | `composer test` | `php cli.php`                                  |
+| Rust     | [`rust/`](rust)                         | (nada)                            | `cargo test`    | `cargo run`                                    |
+| Go       | [`go/`](go)                             | (nada)                            | `go test ./...` | `go run ./cmd/cli`                             |
 
 Cada carpeta tiene su propio README con los requisitos, la lista ordenada de casos TDD y las notas
 técnicas de esa implementación.

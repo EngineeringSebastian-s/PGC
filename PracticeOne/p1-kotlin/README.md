@@ -37,12 +37,12 @@ En Linux/macOS: `./gradlew test`. El reporte HTML queda en `build/reports/tests/
 
 `src/test/kotlin/practica/tdd/CalculatorTest.kt`, 4 métodos / 7 ejecuciones:
 
-| Test | Qué demuestra |
-|------|---------------|
-| `` `la clase de test se crea una sola vez` `` | `@BeforeAll` con ciclo de vida por clase |
-| `` `suma 1 + 1` `` | `@Test` + `assertEquals` |
-| `` `divide lanza cuando el divisor es cero` `` | `assertThrows` sobre una lambda |
-| `` `suma varios pares` `` | `@ParameterizedTest` + `@CsvSource`, 4 filas |
+| Test                                           | Qué demuestra                                |
+|------------------------------------------------|----------------------------------------------|
+| `` `la clase de test se crea una sola vez` ``  | `@BeforeAll` con ciclo de vida por clase     |
+| `` `suma 1 + 1` ``                             | `@Test` + `assertEquals`                     |
+| `` `divide lanza cuando el divisor es cero` `` | `assertThrows` sobre una lambda              |
+| `` `suma varios pares` ``                      | `@ParameterizedTest` + `@CsvSource`, 4 filas |
 
 ## Las tres diferencias con Java que conviene señalar
 

@@ -1,6 +1,6 @@
-# Guía de exposición — Práctica 1 (TDD)
+# Guía — Práctica 1 (TDD)
 
-Guion para presentar la práctica. Incluye el orden sugerido, qué mostrar en cada momento, los
+Guia de la práctica. Incluye el orden sugerido, qué mostrar en cada momento, los
 comandos exactos, qué decir en cada concepto, las preguntas probables y el plan B si algo falla en vivo.
 
 ---
@@ -16,7 +16,7 @@ Tiene que dar todo `[ok]`. Si algo falta, el propio script dice el comando para 
 > **Si vas a exponer desde otra máquina**, la vía corta es Docker: `.\scripts\docker-correr-todo.ps1`
 > corre las ocho suítes sin instalar ningún SDK. Bajá las imágenes **el día anterior**, no en el
 > momento. Ver [DOCKER.md](../DOCKER.md).
-Si es la primera vez en esa máquina:
+> Si es la primera vez en esa máquina:
 
 ```powershell
 .\scripts\preparar-entorno.ps1
@@ -36,23 +36,23 @@ Salida esperada: **`Todo verde: 6 suítes, 111 tests.`**
 1. Una terminal en la raíz del repo.
 2. `npm run dev` corriendo en `PracticeOne/guia-web` → <http://localhost:43141>.
 3. El editor con estos archivos ya abiertos en pestañas:
-   - `p1-java/src/test/java/practica/tdd/CalculatorTest.java`
-   - `p1-java/src/test/java/practica/tdd/ecuacion/EcuacionPrimerGradoMockitoTest.java`
-   - `crud-tdd/rust/tests/repositorio_videojuegos.rs`
-   - `crud-tdd/python/tests/test_repositorio_vinilos.py`
+    - `p1-java/src/test/java/practica/tdd/CalculatorTest.java`
+    - `p1-java/src/test/java/practica/tdd/ecuacion/EcuacionPrimerGradoMockitoTest.java`
+    - `crud-tdd/rust/tests/repositorio_videojuegos.rs`
+    - `crud-tdd/python/tests/test_repositorio_vinilos.py`
 
 ---
 
 ## Estructura sugerida (20–25 min)
 
-| # | Bloque | Tiempo | Qué se muestra |
-|---|--------|--------|----------------|
-| 0 | Qué es TDD | 2 min | Diapositiva / pizarra: el ciclo |
-| 1 | Punto 1 — JUnit 5 | 5 min | Guía web + `CalculatorTest` |
-| 2 | Punto 1 — Kotlin | 2 min | `CalculatorTest.kt`, las diferencias |
-| 3 | Punto 2 — Softtek | 6 min | La ecuación, el mock, unitario vs. integración |
-| 4 | Punto 3 — CRUD ×6 | 8 min | `correr-todos-los-tests.ps1` + comparación |
-| 5 | Cierre | 2 min | Qué se aprendió repitiendo el ejercicio |
+| # | Bloque            | Tiempo | Qué se muestra                                 |
+|---|-------------------|--------|------------------------------------------------|
+| 0 | Qué es TDD        | 2 min  | Diapositiva / pizarra: el ciclo                |
+| 1 | Punto 1 — JUnit 5 | 5 min  | Guía web + `CalculatorTest`                    |
+| 2 | Punto 1 — Kotlin  | 2 min  | `CalculatorTest.kt`, las diferencias           |
+| 3 | Punto 2 — Softtek | 6 min  | La ecuación, el mock, unitario vs. integración |
+| 4 | Punto 3 — CRUD ×6 | 8 min  | `correr-todos-los-tests.ps1` + comparación     |
+| 5 | Cierre            | 2 min  | Qué se aprendió repitiendo el ejercicio        |
 
 ---
 
@@ -101,7 +101,8 @@ caso de prueba, y de hecho suele ser el que más bugs encuentra."
 
 ```java
 ArithmeticException exception = assertThrows(ArithmeticException.class, () -> calculator.divide(1, 0));
-assertEquals("/ by zero", exception.getMessage());
+
+assertEquals("/ by zero",exception.getMessage());
 ```
 
 **`@BeforeEach`** — "Corre antes de cada test. JUnit además crea una instancia nueva de la clase por
@@ -130,7 +131,9 @@ Abrí `p1-kotlin/src/test/kotlin/practica/tdd/CalculatorTest.kt` y señalá tres
 
 ```kotlin
 @Test
-fun `divide lanza cuando el divisor es cero`() { ... }
+fun `divide lanza cuando el divisor es cero`() {
+    ...
+}
 ```
 
 > "En Java tengo que elegir entre un nombre legible y un nombre válido. En Kotlin el nombre del test
@@ -170,11 +173,11 @@ Mostrá que el código está partido en **dos clases** (guía web, grupo **Softt
 
 ### Los tres archivos de test
 
-| Archivo | Tipo | Qué prueba |
-|---------|------|------------|
-| `ParseadorTest` | Unitario | El parseo, caso por caso (7 tests) |
-| `EcuacionPrimerGradoMockitoTest` | Unitario **aislado** | Solo la fórmula, con mock (2 tests) |
-| `EcuacionPrimerGradoIntegrationTest` | Integración | Las dos clases juntas (4 tests) |
+| Archivo                              | Tipo                 | Qué prueba                          |
+|--------------------------------------|----------------------|-------------------------------------|
+| `ParseadorTest`                      | Unitario             | El parseo, caso por caso (7 tests)  |
+| `EcuacionPrimerGradoMockitoTest`     | Unitario **aislado** | Solo la fórmula, con mock (2 tests) |
+| `EcuacionPrimerGradoIntegrationTest` | Integración          | Las dos clases juntas (4 tests)     |
 
 ### El momento clave: por qué el mock
 
@@ -184,14 +187,25 @@ Abrí `EcuacionPrimerGradoMockitoTest.java`.
 > falla… **¿cuál de las dos clases está rota?** No lo sé. Tengo que ir a investigar."
 
 ```java
-@InjectMocks private EcuacionPrimerGrado ecuacionPrimerGrado;
-@Mock private Parseador parseador;
 
-when(parseador.obtenerParte1(ecuacion)).thenReturn(2);
-when(parseador.obtenerParte2(ecuacion)).thenReturn(-1);
-when(parseador.obtenerParte3(ecuacion)).thenReturn(0);
+@InjectMocks
+private EcuacionPrimerGrado ecuacionPrimerGrado;
+@Mock
+private Parseador parseador;
 
-assertEquals(0.5, ecuacionPrimerGrado.obtenerResultado(ecuacion));
+when(parseador.obtenerParte1(ecuacion)).
+
+thenReturn(2);
+
+when(parseador.obtenerParte2(ecuacion)).
+
+thenReturn(-1);
+
+when(parseador.obtenerParte3(ecuacion)).
+
+thenReturn(0);
+
+assertEquals(0.5,ecuacionPrimerGrado.obtenerResultado(ecuacion));
 ```
 
 > "Este test **no parsea nada**. Reemplazo el parseador por un doble programado: 'cuando te pregunten
@@ -213,12 +227,12 @@ Si la guía web está en modo JVM, el paso `mock-formula` muestra esto corriendo
 
 Cerrá con la tabla:
 
-| | Test unitario (con mock) | Test de integración |
-|---|---|---|
-| Qué prueba | Una clase sola | Varias clases juntas |
-| Si falla | Sé exactamente quién | Sé que algo no encaja |
-| Velocidad | Instantáneo | Más lento |
-| Punto ciego | Asume el contrato | Ninguno, pero no localiza |
+|             | Test unitario (con mock) | Test de integración       |
+|-------------|--------------------------|---------------------------|
+| Qué prueba  | Una clase sola           | Varias clases juntas      |
+| Si falla    | Sé exactamente quién     | Sé que algo no encaja     |
+| Velocidad   | Instantáneo              | Más lento                 |
+| Punto ciego | Asume el contrato        | Ninguno, pero no localiza |
 
 ---
 
@@ -378,16 +392,16 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 
 ## Plan B si algo falla en vivo
 
-| Si falla… | Hacé esto |
-|-----------|-----------|
-| Gradle (`p1-java` / `p1-kotlin`) | Ver la sección de abajo. **La guía web sigue funcionando igual**: cae sola en modo "respaldo". |
-| La guía web no levanta | Mostrá los archivos de test directamente en el editor. El guion funciona igual. |
-| `npm test` (React) | Corré `npx vitest --run`. Si `npm` da error de firma digital en PowerShell, usá `npm.cmd`. |
-| `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`. |
-| `composer test` falla | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP). |
-| No anda internet | Todo corre offline **si ya corriste `preparar-entorno.ps1` antes**. Rust, Go y C# no necesitan red (no tienen dependencias externas); npm, pip y Composer sí, la primera vez. |
-| Cualquier SDK falta o falla | `docker compose run --rm <servicio>` corre esa suite igual, sin el SDK instalado. Ver [DOCKER.md](../DOCKER.md). |
-| Se cae todo | `scripts\correr-todos-los-tests.ps1` guardado como captura de pantalla, de ensayo previo. **Sacala antes.** |
+| Si falla…                                  | Hacé esto                                                                                                                                                                     |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Gradle (`p1-java` / `p1-kotlin`)           | Ver la sección de abajo. **La guía web sigue funcionando igual**: cae sola en modo "respaldo".                                                                                |
+| La guía web no levanta                     | Mostrá los archivos de test directamente en el editor. El guion funciona igual.                                                                                               |
+| `npm test` (React)                         | Corré `npx vitest --run`. Si `npm` da error de firma digital en PowerShell, usá `npm.cmd`.                                                                                    |
+| `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`.                                                                                                     |
+| `composer test` falla                      | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP).                                                                                                 |
+| No anda internet                           | Todo corre offline **si ya corriste `preparar-entorno.ps1` antes**. Rust, Go y C# no necesitan red (no tienen dependencias externas); npm, pip y Composer sí, la primera vez. |
+| Cualquier SDK falta o falla                | `docker compose run --rm <servicio>` corre esa suite igual, sin el SDK instalado. Ver [DOCKER.md](../DOCKER.md).                                                              |
+| Se cae todo                                | `scripts\correr-todos-los-tests.ps1` guardado como captura de pantalla, de ensayo previo. **Sacala antes.**                                                                   |
 
 ---
 
@@ -410,7 +424,9 @@ import java.nio.channels.Selector;
 
 public class Check {
     public static void main(String[] args) throws Exception {
-        try (Selector s = Selector.open()) { System.out.println("OK"); }
+        try (Selector s = Selector.open()) {
+            System.out.println("OK");
+        }
     }
 }
 ```

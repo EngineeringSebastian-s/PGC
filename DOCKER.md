@@ -37,15 +37,15 @@ Para correr solo los seis CRUD del punto 3, sin Java ni Kotlin:
 
 ## Correr un proyecto suelto
 
-| Proyecto | Comando |
-|----------|---------|
-| CRUD C# | `docker compose run --rm csharp` |
-| CRUD Python | `docker compose run --rm python` |
-| CRUD React | `docker compose run --rm react` |
-| CRUD PHP | `docker compose run --rm php` |
-| CRUD Rust | `docker compose run --rm rust` |
-| CRUD Go | `docker compose run --rm go` |
-| JUnit Java | `docker compose run --rm java` |
+| Proyecto     | Comando                          |
+|--------------|----------------------------------|
+| CRUD C#      | `docker compose run --rm csharp` |
+| CRUD Python  | `docker compose run --rm python` |
+| CRUD React   | `docker compose run --rm react`  |
+| CRUD PHP     | `docker compose run --rm php`    |
+| CRUD Rust    | `docker compose run --rm rust`   |
+| CRUD Go      | `docker compose run --rm go`     |
+| JUnit Java   | `docker compose run --rm java`   |
 | JUnit Kotlin | `docker compose run --rm kotlin` |
 
 Para entrar a un contenedor y trastear a mano (por ejemplo, correr la CLI interactiva de un CRUD):
@@ -101,13 +101,13 @@ docker compose run --rm kotlin
 
 Por eso **conviven los dos caminos** y ninguno reemplaza al otro:
 
-| | Local (`scripts\correr-todos-los-tests.ps1`) | Docker (`scripts\docker-correr-todo.ps1`) |
-|---|---|---|
-| Requisitos | 7 toolchains | Solo Docker |
-| Primera corrida | Instalar cada SDK | Bajar ~5 GB |
-| Corridas siguientes | Instantáneo | Rápido, con algo de overhead |
-| Java / Kotlin | ✗ bloqueado en esta máquina | ✓ funciona |
-| Portabilidad | Depende de la máquina | Igual en cualquier lado |
+|                     | Local (`scripts\correr-todos-los-tests.ps1`) | Docker (`scripts\docker-correr-todo.ps1`) |
+|---------------------|----------------------------------------------|-------------------------------------------|
+| Requisitos          | 7 toolchains                                 | Solo Docker                               |
+| Primera corrida     | Instalar cada SDK                            | Bajar ~5 GB                               |
+| Corridas siguientes | Instantáneo                                  | Rápido, con algo de overhead              |
+| Java / Kotlin       | ✗ bloqueado en esta máquina                  | ✓ funciona                                |
+| Portabilidad        | Depende de la máquina                        | Igual en cualquier lado                   |
 
 ## Detalles de implementación
 

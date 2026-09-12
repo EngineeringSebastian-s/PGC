@@ -48,12 +48,12 @@ Archivos: `src/main/java/practica/tdd/Calculator.java` y `src/test/java/practica
 La clase bajo prueba es mínima a propósito (`add` y `divide`): el objetivo del punto no es el
 algoritmo sino **el andamiaje de JUnit 5**. Cada test del archivo demuestra una pieza distinta:
 
-| Test | Qué demuestra | Anotación / API |
-|------|---------------|-----------------|
-| `addition` | El test más simple posible: una aserción de igualdad | `@Test`, `assertEquals` |
-| `divideThrowsWhenDivisorIsZero` | Que un caso de error *también* es un caso de prueba | `assertThrows` |
-| `addSeveralPairs` | Un mismo test corrido con varios juegos de datos | `@ParameterizedTest`, `@CsvSource` |
-| (todos) | Estado fresco antes de cada test | `@BeforeEach` |
+| Test                            | Qué demuestra                                        | Anotación / API                    |
+|---------------------------------|------------------------------------------------------|------------------------------------|
+| `addition`                      | El test más simple posible: una aserción de igualdad | `@Test`, `assertEquals`            |
+| `divideThrowsWhenDivisorIsZero` | Que un caso de error *también* es un caso de prueba  | `assertThrows`                     |
+| `addSeveralPairs`               | Un mismo test corrido con varios juegos de datos     | `@ParameterizedTest`, `@CsvSource` |
+| (todos)                         | Estado fresco antes de cada test                     | `@BeforeEach`                      |
 
 ### Los cuatro conceptos, para explicarlos
 
@@ -99,11 +99,11 @@ test unitario y uno de integración**. Por eso hay tres archivos de test, no uno
 
 ### Los tres archivos de test
 
-| Archivo | Tipo | Qué prueba | Dependencias reales |
-|---------|------|------------|---------------------|
-| `ParseadorTest` | Unitario | El parseo, caso por caso (7 tests) | Ninguna: `Parseador` no depende de nada |
-| `EcuacionPrimerGradoMockitoTest` | Unitario **aislado** | Solo la fórmula (2 tests) | Ninguna: el `Parseador` está *mockeado* |
-| `EcuacionPrimerGradoIntegrationTest` | Integración | Las dos clases juntas (4 tests) | El `Parseador` real |
+| Archivo                              | Tipo                 | Qué prueba                         | Dependencias reales                     |
+|--------------------------------------|----------------------|------------------------------------|-----------------------------------------|
+| `ParseadorTest`                      | Unitario             | El parseo, caso por caso (7 tests) | Ninguna: `Parseador` no depende de nada |
+| `EcuacionPrimerGradoMockitoTest`     | Unitario **aislado** | Solo la fórmula (2 tests)          | Ninguna: el `Parseador` está *mockeado* |
+| `EcuacionPrimerGradoIntegrationTest` | Integración          | Las dos clases juntas (4 tests)    | El `Parseador` real                     |
 
 ### El punto que hay que saber explicar: el mock
 
@@ -139,12 +139,12 @@ reemplaza al otro.
 
 ## Resumen de tests
 
-| Clase | Tests |
-|-------|-------|
-| `CalculatorTest` | 3 métodos, 6 ejecuciones (el parametrizado cuenta como 4) |
-| `ParseadorTest` | 7 |
-| `EcuacionPrimerGradoMockitoTest` | 2 |
-| `EcuacionPrimerGradoIntegrationTest` | 4 |
+| Clase                                | Tests                                                     |
+|--------------------------------------|-----------------------------------------------------------|
+| `CalculatorTest`                     | 3 métodos, 6 ejecuciones (el parametrizado cuenta como 4) |
+| `ParseadorTest`                      | 7                                                         |
+| `EcuacionPrimerGradoMockitoTest`     | 2                                                         |
+| `EcuacionPrimerGradoIntegrationTest` | 4                                                         |
 
 ## Extra: `LiveBridge`
 

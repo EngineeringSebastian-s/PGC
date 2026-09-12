@@ -30,11 +30,11 @@ Abre en <http://localhost:43141>.
 
 Tres grupos de pasos, definidos en `src/lib/`:
 
-| Grupo | Archivo | Pasos | Cubre |
-|-------|---------|-------|-------|
-| **Writing Tests** | `steps-junit.ts` | `at-test`, `assert-equals`, `before-each`, `parameterized`, `assert-throws` | Punto 1 (JUnit 5 User Guide) en Java |
-| **Kotlin** | `steps-kotlin.ts` | `kotlin-backticks`, `kotlin-per-class`, `kotlin-before-each`, `kotlin-throws`, `kotlin-parameterized` | Punto 1 en Kotlin |
-| **Softtek** | `steps-softtek.ts` | `parse-parte1` … `parse-invalida`, `eq-menos` … `eq-cero`, `mock-formula`, `first-softtek` | Punto 2 (ecuación de primer grado y mocks) |
+| Grupo             | Archivo            | Pasos                                                                                                 | Cubre                                      |
+|-------------------|--------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| **Writing Tests** | `steps-junit.ts`   | `at-test`, `assert-equals`, `before-each`, `parameterized`, `assert-throws`                           | Punto 1 (JUnit 5 User Guide) en Java       |
+| **Kotlin**        | `steps-kotlin.ts`  | `kotlin-backticks`, `kotlin-per-class`, `kotlin-before-each`, `kotlin-throws`, `kotlin-parameterized` | Punto 1 en Kotlin                          |
+| **Softtek**       | `steps-softtek.ts` | `parse-parte1` … `parse-invalida`, `eq-menos` … `eq-cero`, `mock-formula`, `first-softtek`            | Punto 2 (ecuación de primer grado y mocks) |
 
 Cada paso (`Step` en `src/lib/walkthrough-types.ts`) declara:
 
