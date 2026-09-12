@@ -51,10 +51,11 @@ técnicas de esa implementación.
 
 ## Para exponer
 
-👉 **[`presentacion/index.html`](presentacion)** — una página que recorre el ejercicio: la consigna,
-el ciclo RED → GREEN con corridas reales, y por cada lenguaje el código, el test y su salida.
-Se abre con doble clic y funciona offline. Con `node servidor.mjs` el botón *Correr* ejecuta las
-suites de verdad, en local o en Docker.
+👉 **[`presentacion/index.html`](presentacion)** — una página que recorre la práctica completa
+punto por punto. Para el punto 3 trae una ficha funcional de cada CRUD (qué gestiona, la entidad
+y sus campos, las reglas de validación, las operaciones y los errores) junto al código, el test y
+su corrida. Se abre con doble clic y funciona sin servidor; con `node servidor.mjs`, el botón
+*Correr* ejecuta las suites de verdad, en local o en Docker.
 
 ## Qué cambia de un lenguaje a otro
 

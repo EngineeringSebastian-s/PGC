@@ -64,6 +64,17 @@ Capturar -Nombre 'php' -Carpeta "$cruds\php" -Requiere 'php' -Accion { php vendo
 Capturar -Nombre 'rust' -Carpeta "$cruds\rust" -Requiere 'cargo' -Accion { cargo test }
 Capturar -Nombre 'go' -Carpeta "$cruds\go" -Requiere 'go' -Accion { go test -v ./... }
 
+# --- Puntos 1 y 2 ---
+# En Windows, Gradle no arranca por el problema de loopback de la JVM, así que
+# estas dos se capturan desde Docker. Ver DOCKER.md.
+$raizRepo = Split-Path -Parent (Split-Path -Parent $cruds)
+Capturar -Nombre 'java' -Carpeta $raizRepo -Requiere 'docker' -Accion {
+    docker compose run --rm java
+}
+Capturar -Nombre 'kotlin' -Carpeta $raizRepo -Requiere 'docker' -Accion {
+    docker compose run --rm kotlin
+}
+
 # --- La fase RED ---
 # Se reconstruye sobre una copia temporal del proyecto Go a la que se le saca
 # la validación del título. El repositorio NO se toca.

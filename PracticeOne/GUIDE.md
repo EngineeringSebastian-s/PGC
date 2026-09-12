@@ -36,7 +36,7 @@ Salida esperada: **`Todo verde: 6 suítes, 111 tests.`**
 
 1. Una terminal en la raíz del repo.
 2. `npm run dev` corriendo en `PracticeOne/guia-web` → <http://localhost:43141>.
-3. La presentación del punto 3 servida, para el bloque 4:
+3. La presentación servida, que acompaña toda la exposición:
    `cd PracticeOne\crud-tdd\presentacion && node servidor.mjs` → <http://localhost:43142>
 4. El editor con estos archivos ya abiertos en pestañas:
     - `p1-java/src/test/java/practica/tdd/CalculatorTest.java`
@@ -248,9 +248,9 @@ Cerrá con la tabla:
 
 ### Lo que se proyecta
 
-Abrí <http://localhost:43142> (la presentación del punto 3). Tiene el recorrido armado: la
-consigna, el ciclo RED → GREEN con corridas reales de `go test`, y un explorador con las seis
-pestañas. En cada una está el código, el test y su salida.
+Abrí <http://localhost:43142>. La presentación tiene el recorrido armado y cubre los tres puntos;
+para este bloque, cada pestaña trae una ficha funcional del CRUD —qué gestiona, la entidad y sus
+campos, las reglas de validación, las operaciones y los errores— junto al código, el test y su corrida.
 
 Con <kbd>←</kbd> <kbd>→</kbd> cambiás de lenguaje y con <kbd>R</kbd> corrés la suite en vivo
 delante de la clase. El selector **Local / Docker** de arriba elige el motor.
