@@ -1,0 +1,15 @@
+[package]
+name = "crud_videojuegos"
+version = "1.0.0"
+edition = "2021"
+description = "CRUD en memoria de un catalogo de videojuegos, desarrollado con TDD"
+
+[lib]
+name = "crud_videojuegos"
+path = "src/lib.rs"
+
+[[bin]]
+name = "crud_videojuegos"
+path = "src/main.rs"
+
+[dependencies]
