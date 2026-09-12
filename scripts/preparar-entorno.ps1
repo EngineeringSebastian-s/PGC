@@ -26,7 +26,8 @@ $cruds = Join-Path $practica 'crud-tdd'
 
 $rutasExtra = @(
     "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\PHP.PHP.8.4_Microsoft.Winget.Source_8wekyb3d8bbwe",
-    "$env:USERPROFILE\.cargo\bin"
+    "$env:USERPROFILE\.cargo\bin",
+    "$env:ProgramFiles\Go\bin"
 ) | Where-Object { Test-Path $_ }
 
 foreach ($ruta in $rutasExtra) {
@@ -97,6 +98,16 @@ if (Get-Command cargo -ErrorAction SilentlyContinue) {
     Pop-Location
 } else {
     Write-Saltado 'falta Rust'
+}
+
+# --- Go ---
+Write-Paso 'Go — go build'
+if (Get-Command go -ErrorAction SilentlyContinue) {
+    Push-Location (Join-Path $cruds 'go')
+    & go build ./...
+    Pop-Location
+} else {
+    Write-Saltado 'falta Go'
 }
 
 # --- Java / Kotlin ---

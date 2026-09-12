@@ -18,7 +18,8 @@ $ErrorActionPreference = 'Continue'
 # PHP y cargo instalados con winget no siempre quedan en el PATH de la sesión.
 $rutasExtra = @(
     "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\PHP.PHP.8.4_Microsoft.Winget.Source_8wekyb3d8bbwe",
-    "$env:USERPROFILE\.cargo\bin"
+    "$env:USERPROFILE\.cargo\bin",
+    "$env:ProgramFiles\Go\bin"
 ) | Where-Object { Test-Path $_ }
 
 foreach ($ruta in $rutasExtra) {
@@ -87,6 +88,10 @@ Test-Simple -Herramienta 'Python' -Comando 'python' -ParaQue 'CRUD Python' `
 Test-Simple -Herramienta 'Rust (cargo)' -Comando 'cargo' -ParaQue 'CRUD Rust' `
     -ComoResolver 'winget install Rustlang.Rustup' `
     -LimpiarVersion { param($t) if ($t -match 'cargo \d[\d.]*') { $Matches[0] } else { $t } }
+
+Test-Simple -Herramienta 'Go' -Comando 'go' -Flag 'version' -ParaQue 'CRUD Go' `
+    -ComoResolver 'winget install GoLang.Go' `
+    -LimpiarVersion { param($t) if ($t -match 'go\d[\d.]*') { $Matches[0] } else { $t } }
 
 Test-Simple -Herramienta 'PHP' -Comando 'php' -ParaQue 'CRUD PHP' `
     -ComoResolver 'winget install PHP.PHP.8.4' `
@@ -216,7 +221,7 @@ public class PgcSelectorCheck {
     } else {
         Write-Host '  [X]  La JVM NO puede abrir un Selector de NIO sobre loopback.' -ForegroundColor Red
         Write-Host '       Gradle va a fallar con "Unable to establish loopback connection".' -ForegroundColor Red
-        Write-Host '       Ver PracticeOne/GUIA-EXPOSICION.md, sección "Problema conocido".' -ForegroundColor Red
+        Write-Host '       Ver PracticeOne/GUIDE.md, sección "Problema conocido".' -ForegroundColor Red
     }
 }
 

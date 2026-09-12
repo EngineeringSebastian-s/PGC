@@ -25,7 +25,7 @@ cada suite es lenta, las siguientes son instantáneas):
 .\scripts\correr-todos-los-tests.ps1
 ```
 
-Salida esperada: **`Todo verde: 5 suítes, 90 tests.`**
+Salida esperada: **`Todo verde: 6 suítes, 111 tests.`**
 
 **Dejá abierto de antemano:**
 
@@ -47,7 +47,7 @@ Salida esperada: **`Todo verde: 5 suítes, 90 tests.`**
 | 1 | Punto 1 — JUnit 5 | 5 min | Guía web + `CalculatorTest` |
 | 2 | Punto 1 — Kotlin | 2 min | `CalculatorTest.kt`, las diferencias |
 | 3 | Punto 2 — Softtek | 6 min | La ecuación, el mock, unitario vs. integración |
-| 4 | Punto 3 — CRUD ×5 | 7 min | `correr-todos-los-tests.ps1` + comparación |
+| 4 | Punto 3 — CRUD ×6 | 8 min | `correr-todos-los-tests.ps1` + comparación |
 | 5 | Cierre | 2 min | Qué se aprendió repitiendo el ejercicio |
 
 ---
@@ -65,7 +65,7 @@ El ciclo, tres pasos:
 3. **REFACTOR** — ahora que tengo la red de seguridad del test en verde, mejoro el código.
    Si rompo algo, el test me avisa en el acto.
 
-> "Los 90 tests del punto 3 se escribieron así, uno por uno. En los README de cada proyecto está la
+> "Los 111 tests del punto 3 se escribieron así, uno por uno. En los README de cada proyecto está la
 > lista numerada en el orden exacto en que se fueron agregando."
 
 **Por qué importa en esta materia:** TDD es la contracara de "primero programo, después pruebo si me
@@ -218,14 +218,14 @@ Cerrá con la tabla:
 
 ---
 
-## Bloque 4 — Punto 3: CRUD con TDD en cinco lenguajes (7 min)
+## Bloque 4 — Punto 3: CRUD con TDD en seis lenguajes (8 min)
 
 **Consigna:** CRUD con TDD en tres lenguajes distintos, ni Java ni Kotlin, uno con framework de front.
 
-> "La consigna pedía tres: hicimos **cinco**. Los tres obligatorios son C#, Python y React —React cubre
-> lo del framework de front—. PHP y Rust se sumaron como extensión."
+> "La consigna pedía tres: hicimos **seis**. Los tres obligatorios son C#, Python y React —React cubre
+> lo del framework de front—. PHP, Rust y Go se sumaron como extensión."
 
-### El momento fuerte: correr las cinco suítes
+### El momento fuerte: correr las seis suítes
 
 ```powershell
 .\scripts\correr-todos-los-tests.ps1
@@ -241,13 +241,14 @@ CRUD Python (pytest)   OK        16
 CRUD React (Vitest)    OK        21
 CRUD PHP (PHPUnit)     OK        18
 CRUD Rust (cargo test) OK        18
+CRUD Go (go test)      OK        21
 
-Todo verde: 5 suítes, 90 tests.
+Todo verde: 6 suítes, 111 tests.
 ```
 
-> "Cinco lenguajes, cinco frameworks de testing distintos, 90 tests, un solo comando."
+> "Seis lenguajes, seis frameworks de testing distintos, 111 tests, un solo comando."
 
-### El ejercicio es el mismo en los cinco
+### El ejercicio es el mismo en los seis
 
 > "Una entidad con validaciones, un repositorio en memoria con las cinco operaciones del CRUD, ids
 > autoincrementales, y dos clases de error bien separadas: *datos inválidos* y *no encontrado*.
@@ -257,27 +258,48 @@ Todo verde: 5 suítes, 90 tests.
 
 ### Lo interesante: lo que no se pudo repetir igual
 
-Esta es la parte que da nota. Abrí **`crud-tdd/rust/tests/repositorio_videojuegos.rs`** al lado de
-**`crud-tdd/python/tests/test_repositorio_vinilos.py`**.
+Esta es la parte que da nota. Abrí tres archivos al lado:
+**`crud-tdd/python/tests/test_repositorio_vinilos.py`**,
+**`crud-tdd/rust/tests/repositorio_videojuegos.rs`** y
+**`crud-tdd/go/repositorio_test.go`**.
 
-En Python (y en C#, PHP y React) el caso de error necesita un mecanismo aparte:
+Mismo caso de prueba —*pedir un id que no existe*— y tres posturas distintas.
+
+**1. Excepciones** (Python, C#, PHP, React). El error viaja por un canal aparte del valor de retorno,
+así que el test necesita un mecanismo especial para capturarlo:
 
 ```python
 with pytest.raises(ViniloNoEncontradoError):
     repositorio.obtener_por_id(999)
 ```
 
-En Rust, no:
+**2. Valor de retorno, verificado por el compilador** (Rust):
 
 ```rust
 let resultado = repositorio.obtener_por_id(999);
 assert_eq!(resultado, Err(ErrorCatalogo::VideojuegoNoEncontrado(999)));
 ```
 
-> "Rust no tiene excepciones. El error **es** el valor de retorno, adentro de un `Result`. Así que el
-> error se prueba con la misma aserción de igualdad que el caso feliz. Y hay un plus: el compilador
-> **obliga** a quien llama a hacer algo con ese `Result`. En los otros cuatro lenguajes, una excepción
-> que nadie captura se puede colar hasta producción."
+**3. Valor de retorno, verificado por convención** (Go):
+
+```go
+_, err := repositorio.ObtenerPorID(999)
+
+if !errors.Is(err, catalogo.ErrNoEncontrada) {
+    t.Errorf("se esperaba ErrNoEncontrada, se obtuvo: %v", err)
+}
+```
+
+> "Rust y Go parten de la misma idea: el error no es una excepción, es un valor de retorno. Y llegan
+> a dos lugares distintos.
+>
+> En Rust el `Result` **no se puede ignorar**: si no lo tratás, el compilador avisa.
+>
+> En Go, `repositorio.Eliminar(id)` a secas compila perfecto y tira el error a la basura en silencio.
+> Go pone la disciplina en la convención y el linter; Rust la pone en el sistema de tipos.
+>
+> Y eso cambia el peso del test: **en Go el test es la única red** que verifica que el error se está
+> propagando. Es probablemente la conclusión más concreta de haber repetido el ejercicio seis veces."
 
 Otras diferencias, por si preguntan:
 
@@ -287,6 +309,9 @@ Otras diferencias, por si preguntan:
   usuario con Testing Library. El "repositorio" vive dentro de un hook con estado.
 - **PHP** — entidad inmutable con `readonly`; actualizar construye un objeto nuevo, así que si la
   actualización es inválida el objeto original queda intacto (y hay un test que lo verifica).
+- **Go** — las cinco reglas de validación no son cinco tests, son **una tabla** recorrida con `t.Run`
+  (el idioma canónico de Go, equivalente a `@ParameterizedTest` pero sin anotaciones: un `for` sobre
+  un slice). Además no trae aserciones: se compara con un `if` y se reporta con `t.Errorf`.
 
 ### Si queda tiempo: la demo manual
 
@@ -305,16 +330,18 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 
 > "Tres conclusiones:
 >
-> **Una.** El test primero cambia el diseño, no solo la confianza. Los cinco repositorios terminaron
+> **Una.** El test primero cambia el diseño, no solo la confianza. Los seis repositorios terminaron
 > con ids asignados por el repositorio y no por quien llama, porque el primer test que se escribió fue
 > `deberia_asignarle_id_autoincremental`. El test forzó esa decisión.
 >
 > **Dos.** Mockear no es hacer trampa: es decidir qué se está probando. El test con mock y el de
 > integración responden preguntas distintas, y hacen falta los dos.
 >
-> **Tres.** Repetir el mismo ejercicio en cinco lenguajes mostró que el *ciclo* RED-GREEN-REFACTOR es
+> **Tres.** Repetir el mismo ejercicio en seis lenguajes mostró que el *ciclo* RED-GREEN-REFACTOR es
 > idéntico en todos, pero lo que el lenguaje te deja expresar en un test cambia mucho. El caso más
-> claro es el manejo de errores en Rust."
+> claro es el manejo de errores: con excepciones, con `Result` verificado por el compilador, o con
+> valores de error que nadie te obliga a mirar. Cuanto menos te cubre el lenguaje, más trabajo hace
+> el test."
 
 ---
 
@@ -333,9 +360,10 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 > Un stub devuelve respuestas prearmadas. Un mock además permite verificar *cómo* fue llamado
 > (`verify(...)`). En este trabajo se usa Mockito en modo stub: solo `when(...).thenReturn(...)`.
 
-**¿Por qué cinco lenguajes y no tres?**
-> Los tres obligatorios están (C#, Python, React). PHP y Rust se agregaron para poder comparar: Rust
-> en particular obliga a repensar cómo se escribe el test del caso de error.
+**¿Por qué seis lenguajes y no tres?**
+> Los tres obligatorios están (C#, Python, React). PHP, Rust y Go se agregaron para poder comparar.
+> Rust y Go en particular obligan a repensar cómo se escribe el test del caso de error, y entre ellos
+> dos muestran dos soluciones distintas al mismo problema.
 
 **¿Cuánta cobertura tienen?**
 > No se midió como métrica de la consigna. Los proyectos tienen la infraestructura lista
@@ -353,7 +381,7 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 | `npm test` (React) | Corré `npx vitest --run`. Si `npm` da error de firma digital en PowerShell, usá `npm.cmd`. |
 | `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`. |
 | `composer test` falla | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP). |
-| No anda internet | Todo corre offline **si ya corriste `preparar-entorno.ps1` antes**. Rust y C# no necesitan red; npm, pip y Composer sí, la primera vez. |
+| No anda internet | Todo corre offline **si ya corriste `preparar-entorno.ps1` antes**. Rust, Go y C# no necesitan red (no tienen dependencias externas); npm, pip y Composer sí, la primera vez. |
 | Se cae todo | `scripts\correr-todos-los-tests.ps1` guardado como captura de pantalla, de ensayo previo. **Sacala antes.** |
 
 ---
@@ -406,5 +434,5 @@ este repo. Las causas habituales en Windows, en orden de probabilidad acá:
 - **La guía web funciona igual.** Intenta correr Gradle y, al fallar, cae sola en la réplica simulada.
   Se nota solo en que la insignia de la terminal dice `respaldo` en vez de `JVM`. El recorrido
   completo de los puntos 1 y 2 se puede exponer sin tocar Gradle.
-- Los **cinco CRUD del punto 3 no usan Java**: `correr-todos-los-tests.ps1` funciona perfecto.
+- Los **seis CRUD del punto 3 no usan Java**: `correr-todos-los-tests.ps1` funciona perfecto.
 - El código de `p1-java` y `p1-kotlin` está completo y es revisable en el editor.

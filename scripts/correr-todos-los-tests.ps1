@@ -3,7 +3,7 @@
     Corre las suítes de test del repo y muestra un resumen.
 
 .DESCRIPTION
-    Por defecto corre los cinco CRUD del punto 3 (C#, Python, React, PHP, Rust).
+    Por defecto corre los seis CRUD del punto 3 (C#, Python, React, PHP, Rust, Go).
     Con -ConJava agrega p1-java y p1-kotlin, que necesitan Gradle.
 
     Cada proyecto que no tenga su herramienta instalada se reporta como SALTEADO,
@@ -29,7 +29,8 @@ $cruds = Join-Path $practica 'crud-tdd'
 
 $rutasExtra = @(
     "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\PHP.PHP.8.4_Microsoft.Winget.Source_8wekyb3d8bbwe",
-    "$env:USERPROFILE\.cargo\bin"
+    "$env:USERPROFILE\.cargo\bin",
+    "$env:ProgramFiles\Go\bin"
 ) | Where-Object { Test-Path $_ }
 
 foreach ($ruta in $rutasExtra) {
@@ -91,6 +92,9 @@ Invoke-Suite -Nombre 'CRUD PHP (PHPUnit)' -Carpeta (Join-Path $cruds 'php') `
 
 Invoke-Suite -Nombre 'CRUD Rust (cargo test)' -Carpeta (Join-Path $cruds 'rust') `
     -Requiere 'cargo' -TestsEsperados 18 -Accion { & cargo test }
+
+Invoke-Suite -Nombre 'CRUD Go (go test)' -Carpeta (Join-Path $cruds 'go') `
+    -Requiere 'go' -TestsEsperados 21 -Accion { & go test -v ./... }
 
 if ($ConJava) {
     if (-not $env:JAVA_HOME) {

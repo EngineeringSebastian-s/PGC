@@ -1,0 +1,8 @@
+# Binarios compilados
+/cli
+/cli.exe
+*.exe
+
+# Perfiles de cobertura
+*.out
+coverage.html

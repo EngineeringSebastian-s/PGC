@@ -17,7 +17,7 @@ Realizar los ejercicios que están en las siguientes páginas tal cual están ah
 |---------|-------|-----------|
 | [`p1-java/`](p1-java) | 1 y 2 | JUnit 5 (`Calculator`) + ecuación de primer grado con Mockito |
 | [`p1-kotlin/`](p1-kotlin) | 1 | El mismo ejercicio de JUnit 5, en Kotlin |
-| [`crud-tdd/`](crud-tdd) | 3 | Cinco CRUD con TDD: C#, Python, React, PHP y Rust |
+| [`crud-tdd/`](crud-tdd) | 3 | Seis CRUD con TDD: C#, Python, React, PHP, Rust y Go |
 | [`guia-web/`](guia-web) | 1 y 2 | Guía interactiva para proyectar durante la exposición |
 
 Cada carpeta tiene su propio README con los requisitos, el detalle de los tests y las notas técnicas.
@@ -34,15 +34,16 @@ Cada carpeta tiene su propio README con los requisitos, el detalle de los tests 
 | Punto 3 — React | `crud-tdd/javascript-react` | `npm test` |
 | Punto 3 — PHP | `crud-tdd/php` | `composer test` |
 | Punto 3 — Rust | `crud-tdd/rust` | `cargo test` |
+| Punto 3 — Go | `crud-tdd/go` | `go test ./...` |
 | Guía web | `guia-web` | `npm run dev` → <http://localhost:43141> |
 
 Los scripts de [`../scripts/`](../scripts) hacen esto solo: `verificar-entorno.ps1` dice qué falta,
-`preparar-entorno.ps1` instala las dependencias y `correr-todos-los-tests.ps1` corre las cinco suítes
+`preparar-entorno.ps1` instala las dependencias y `correr-todos-los-tests.ps1` corre las seis suítes
 de una.
 
 ## Para exponer
 
-👉 **[GUIA-EXPOSICION.md](GUIDE.md)** — el guion completo: orden, qué mostrar en cada
+👉 **[GUIDE.md](GUIDE.md)** — el guion completo: orden, qué mostrar en cada
 momento, qué comandos correr, qué decir en cada concepto y qué hacer si algo falla en vivo.
 
 ## Resumen de tests
@@ -59,3 +60,4 @@ momento, qué comandos correr, qué decir en cada concepto y qué hacer si algo 
 | `crud-tdd/javascript-react` | Vitest + Testing Library | 21 |
 | `crud-tdd/php` | PHPUnit | 18 |
 | `crud-tdd/rust` | `cargo test` | 18 |
+| `crud-tdd/go` | `go test` | 21 |
