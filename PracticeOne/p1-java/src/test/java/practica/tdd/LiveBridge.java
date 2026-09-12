@@ -2,6 +2,7 @@ package practica.tdd;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
+
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.engine.support.descriptor.MethodSource;
@@ -15,6 +16,9 @@ import practica.tdd.ecuacion.EcuacionPrimerGrado;
 import practica.tdd.ecuacion.Parseador;
 
 public final class LiveBridge {
+
+    private LiveBridge() {
+    }
 
     public static void main(String[] args) throws Exception {
         System.setOut(new java.io.PrintStream(System.out, true, StandardCharsets.UTF_8));
@@ -230,35 +234,6 @@ public final class LiveBridge {
         }
     }
 
-    private static final class TestExecutionListenerPrinter
-            implements org.junit.platform.launcher.TestExecutionListener {
-        @Override
-        public void executionStarted(TestIdentifier testIdentifier) {
-            if (testIdentifier.isTest()) {
-                emit("junit", "{\"status\":\"started\",\"name\":" + quote(label(testIdentifier)) + "}");
-            }
-        }
-
-        @Override
-        public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult result) {
-            if (!testIdentifier.isTest()) {
-                return;
-            }
-            String status = result.getStatus() == TestExecutionResult.Status.SUCCESSFUL ? "PASSED" : "FAILED";
-            String kind = "PASSED".equals(status) ? "pass" : "fail";
-            line(kind, label(testIdentifier) + "  " + status);
-            emit("junit", "{\"status\":" + quote(status) + ",\"name\":" + quote(label(testIdentifier)) + "}");
-        }
-
-        private static String label(TestIdentifier id) {
-            return id.getSource()
-                    .filter(MethodSource.class::isInstance)
-                    .map(MethodSource.class::cast)
-                    .map(src -> src.getClassName() + "#" + src.getMethodName())
-                    .orElse(id.getDisplayName());
-        }
-    }
-
     private static String split(String eq, int a, String op, int b, int c, String focus) {
         return "{\"type\":\"split\",\"equation\":" + quote(eq)
                 + ",\"a\":" + a + ",\"op\":" + quote(op) + ",\"b\":" + b + ",\"c\":" + c
@@ -296,6 +271,32 @@ public final class LiveBridge {
         return out.append('"').toString();
     }
 
-    private LiveBridge() {
+    private static final class TestExecutionListenerPrinter
+            implements org.junit.platform.launcher.TestExecutionListener {
+        private static String label(TestIdentifier id) {
+            return id.getSource()
+                    .filter(MethodSource.class::isInstance)
+                    .map(MethodSource.class::cast)
+                    .map(src -> src.getClassName() + "#" + src.getMethodName())
+                    .orElse(id.getDisplayName());
+        }
+
+        @Override
+        public void executionStarted(TestIdentifier testIdentifier) {
+            if (testIdentifier.isTest()) {
+                emit("junit", "{\"status\":\"started\",\"name\":" + quote(label(testIdentifier)) + "}");
+            }
+        }
+
+        @Override
+        public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult result) {
+            if (!testIdentifier.isTest()) {
+                return;
+            }
+            String status = result.getStatus() == TestExecutionResult.Status.SUCCESSFUL ? "PASSED" : "FAILED";
+            String kind = "PASSED".equals(status) ? "pass" : "fail";
+            line(kind, label(testIdentifier) + "  " + status);
+            emit("junit", "{\"status\":" + quote(status) + ",\"name\":" + quote(label(testIdentifier)) + "}");
+        }
     }
 }

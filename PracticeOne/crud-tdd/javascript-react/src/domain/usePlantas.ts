@@ -1,48 +1,48 @@
-import { useRef, useState } from 'react'
+import {useRef, useState} from 'react'
 
-import type { Planta } from './Planta'
-import { validarPlanta } from './plantaUtils'
+import type {Planta} from './Planta'
+import {validarPlanta} from './plantaUtils'
 
 export function usePlantas() {
-  const [plantas, setPlantas] = useState<Planta[]>([])
-  const siguienteId = useRef(1)
+    const [plantas, setPlantas] = useState<Planta[]>([])
+    const siguienteId = useRef(1)
 
-  function crearPlanta(nombre: string, tipo: string): void {
-    validarPlanta(nombre, 0)
+    function crearPlanta(nombre: string, tipo: string): void {
+        validarPlanta(nombre, 0)
 
-    const nuevaPlanta: Planta = { id: siguienteId.current, nombre, tipo, diasDesdeUltimoRiego: 0 }
-    siguienteId.current += 1
-    setPlantas((actuales) => [...actuales, nuevaPlanta])
-  }
-
-  function obtenerPlantaPorId(id: number): Planta {
-    const planta = plantas.find((p) => p.id === id)
-    if (!planta) {
-      throw new Error(`No se encontro la planta con id ${id}`)
+        const nuevaPlanta: Planta = {id: siguienteId.current, nombre, tipo, diasDesdeUltimoRiego: 0}
+        siguienteId.current += 1
+        setPlantas((actuales) => [...actuales, nuevaPlanta])
     }
 
-    return planta
-  }
+    function obtenerPlantaPorId(id: number): Planta {
+        const planta = plantas.find((p) => p.id === id)
+        if (!planta) {
+            throw new Error(`No se encontro la planta con id ${id}`)
+        }
 
-  function actualizarPlanta(id: number, datos: Partial<Omit<Planta, 'id'>>): void {
-    if (!plantas.some((p) => p.id === id)) {
-      throw new Error(`No se encontro la planta con id ${id}`)
+        return planta
     }
 
-    setPlantas((actuales) => actuales.map((p) => (p.id === id ? { ...p, ...datos } : p)))
-  }
+    function actualizarPlanta(id: number, datos: Partial<Omit<Planta, 'id'>>): void {
+        if (!plantas.some((p) => p.id === id)) {
+            throw new Error(`No se encontro la planta con id ${id}`)
+        }
 
-  function eliminarPlanta(id: number): void {
-    if (!plantas.some((p) => p.id === id)) {
-      throw new Error(`No se encontro la planta con id ${id}`)
+        setPlantas((actuales) => actuales.map((p) => (p.id === id ? {...p, ...datos} : p)))
     }
 
-    setPlantas((actuales) => actuales.filter((p) => p.id !== id))
-  }
+    function eliminarPlanta(id: number): void {
+        if (!plantas.some((p) => p.id === id)) {
+            throw new Error(`No se encontro la planta con id ${id}`)
+        }
 
-  function regarPlanta(id: number): void {
-    actualizarPlanta(id, { diasDesdeUltimoRiego: 0 })
-  }
+        setPlantas((actuales) => actuales.filter((p) => p.id !== id))
+    }
 
-  return { plantas, crearPlanta, obtenerPlantaPorId, actualizarPlanta, eliminarPlanta, regarPlanta }
+    function regarPlanta(id: number): void {
+        actualizarPlanta(id, {diasDesdeUltimoRiego: 0})
+    }
+
+    return {plantas, crearPlanta, obtenerPlantaPorId, actualizarPlanta, eliminarPlanta, regarPlanta}
 }

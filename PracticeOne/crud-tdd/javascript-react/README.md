@@ -4,7 +4,8 @@ CRUD en memoria para gestionar plantas de un jardín (nombre, tipo, días desde 
 
 ## Qué incluye
 
-- `src/domain/Planta.ts` y `plantaUtils.ts`: tipo `Planta` y validaciones (nombre no vacío, días no negativos, cálculo de necesidad de riego).
+- `src/domain/Planta.ts` y `plantaUtils.ts`: tipo `Planta` y validaciones (nombre no vacío, días no negativos, cálculo
+  de necesidad de riego).
 - `src/domain/usePlantas.ts`: hook con el CRUD en memoria (crear, obtener, actualizar, regar, eliminar).
 - `src/components/`: `FormularioPlanta`, `ListaPlantas` y `TarjetaPlanta` para la UI.
 - `src/**/*.test.{ts,tsx}`: 21 tests con Vitest + Testing Library.

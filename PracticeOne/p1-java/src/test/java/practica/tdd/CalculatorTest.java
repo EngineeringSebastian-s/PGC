@@ -30,10 +30,10 @@ class CalculatorTest {
 
     @ParameterizedTest(name = "{0} + {1} = {2}")
     @CsvSource({
-        "1, 1, 2",
-        "2, 3, 5",
-        "0, 8, 8",
-        "-2, 5, 3"
+            "1, 1, 2",
+            "2, 3, 5",
+            "0, 8, 8",
+            "-2, 5, 3"
     })
     void addSeveralPairs(int a, int b, int expected) {
         assertEquals(expected, calculator.add(a, b));

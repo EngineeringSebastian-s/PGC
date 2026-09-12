@@ -14,7 +14,12 @@ object LiveBridge {
     @JvmStatic
     fun main(args: Array<String>) {
         val step = args.firstOrNull()?.trim().orEmpty()
-        emit("meta", """{"jvm":${quote(System.getProperty("java.home"))},"version":${quote(System.getProperty("java.version"))},"step":${quote(step)}}""")
+        emit(
+            "meta",
+            """{"jvm":${quote(System.getProperty("java.home"))},"version":${quote(System.getProperty("java.version"))},"step":${
+                quote(step)
+            }}"""
+        )
         if (step.isEmpty()) {
             emit("error", """{"message":${quote("Falta el id del paso")}}""")
             exitProcess(2)
@@ -41,6 +46,7 @@ object LiveBridge {
                 )
                 runTests("suma 1 + 1")
             }
+
             "kotlin-per-class" -> {
                 line("info", "PER_CLASS: una instancia de CalculatorTest")
                 line("info", "@BeforeAll crearSuite → suiteInicializada = true")
@@ -55,6 +61,7 @@ object LiveBridge {
                 )
                 runTests("la clase de test se crea una sola vez")
             }
+
             "kotlin-before-each" -> {
                 val a = Calculator()
                 line("info", "misma CalculatorTest (PER_CLASS)")
@@ -69,6 +76,7 @@ object LiveBridge {
                 )
                 runTests("suma 1 + 1")
             }
+
             "kotlin-throws" -> {
                 try {
                     calculator.divide(1, 0)
@@ -82,6 +90,7 @@ object LiveBridge {
                 }
                 runTests("divide lanza cuando el divisor es cero")
             }
+
             "kotlin-parameterized" -> {
                 val pairs = listOf(Triple(1, 1, 2), Triple(2, 3, 5), Triple(0, 8, 8), Triple(-2, 5, 3))
                 val rows = pairs.joinToString(",") { (a, b, expected) ->
@@ -92,6 +101,7 @@ object LiveBridge {
                 emit("visual", """{"type":"table","rows":[$rows]}""")
                 runTests("suma varios pares")
             }
+
             else -> {
                 emit("error", """{"message":${quote("Paso no soportado en p1-kotlin: $step")}}""")
                 exitProcess(2)

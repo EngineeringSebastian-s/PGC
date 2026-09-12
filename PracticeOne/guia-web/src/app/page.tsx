@@ -1,5 +1,5 @@
-import { Guide } from "@/components/guide";
+import {Guide} from "@/components/guide";
 
 export default function Home() {
-  return <Guide />;
+    return <Guide/>;
 }
