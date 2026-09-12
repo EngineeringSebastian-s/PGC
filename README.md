@@ -22,6 +22,17 @@ de los puntos 1 y 2 paso a paso, pensada para proyectar en la exposición.
 
 ## Arranque rápido
 
+Hay dos caminos. **Con Docker** no hace falta instalar ni un SDK:
+
+```powershell
+.\scripts\docker-correr-todo.ps1
+```
+
+Corre las **ocho** suítes en contenedores, Java y Kotlin incluidos.
+Detalle en 👉 **[DOCKER.md](DOCKER.md)**.
+
+**Instalando local**, si preferís correr todo nativo:
+
 ```powershell
 # 1. Ver qué falta instalar
 .\scripts\verificar-entorno.ps1
@@ -48,6 +59,8 @@ de los puntos 1 y 2 paso a paso, pensada para proyectar en la exposición.
 | Guía web | `PracticeOne/guia-web` | — | `npm run dev` → <http://localhost:43141> |
 
 ## Requisitos
+
+> Todo esto se puede saltear usando [Docker](DOCKER.md): ahí el único requisito es Docker Desktop.
 
 | Stack | Necesita | Verificado con |
 |-------|----------|----------------|
@@ -81,6 +94,9 @@ mostrar, en qué orden, qué comandos correr, qué decir en cada concepto y qué
 
 ```
 PGC/
+├── DOCKER.md                       # cómo correr todo en contenedores
+├── docker-compose.yml              # un servicio por stack
+├── docker/php.Dockerfile           # única imagen propia (PHP + Composer)
 ├── scripts/                        # verificar / preparar entorno y correr todo
 └── PracticeOne/
     ├── GUIDE.md                    # guion de la presentación

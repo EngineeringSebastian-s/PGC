@@ -41,6 +41,9 @@ Los scripts de [`../scripts/`](../scripts) hacen esto solo: `verificar-entorno.p
 `preparar-entorno.ps1` instala las dependencias y `correr-todos-los-tests.ps1` corre las seis suítes
 de una.
 
+Y si no querés instalar nada, [`../DOCKER.md`](../DOCKER.md): `..\scripts\docker-correr-todo.ps1`
+corre las **ocho** suítes en contenedores —Java y Kotlin incluidos— sin un solo SDK en la máquina.
+
 ## Para exponer
 
 👉 **[GUIDE.md](GUIDE.md)** — el guion completo: orden, qué mostrar en cada

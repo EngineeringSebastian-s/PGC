@@ -12,6 +12,10 @@ comandos exactos, qué decir en cada concepto, las preguntas probables y el plan
 ```
 
 Tiene que dar todo `[ok]`. Si algo falta, el propio script dice el comando para resolverlo.
+
+> **Si vas a exponer desde otra máquina**, la vía corta es Docker: `.\scripts\docker-correr-todo.ps1`
+> corre las ocho suítes sin instalar ningún SDK. Bajá las imágenes **el día anterior**, no en el
+> momento. Ver [DOCKER.md](../DOCKER.md).
 Si es la primera vez en esa máquina:
 
 ```powershell
@@ -382,6 +386,7 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 | `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`. |
 | `composer test` falla | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP). |
 | No anda internet | Todo corre offline **si ya corriste `preparar-entorno.ps1` antes**. Rust, Go y C# no necesitan red (no tienen dependencias externas); npm, pip y Composer sí, la primera vez. |
+| Cualquier SDK falta o falla | `docker compose run --rm <servicio>` corre esa suite igual, sin el SDK instalado. Ver [DOCKER.md](../DOCKER.md). |
 | Se cae todo | `scripts\correr-todos-los-tests.ps1` guardado como captura de pantalla, de ensayo previo. **Sacala antes.** |
 
 ---
@@ -429,7 +434,19 @@ este repo. Las causas habituales en Windows, en orden de probabilidad acá:
    que esta es la segunda opción, no la primera.)
 3. **Antivirus o VPN** interceptando conexiones locales: desactivarlo temporalmente para probar.
 
-### Mientras tanto
+### La solución rápida: correrlo en Docker
+
+Adentro de un contenedor Linux el problema no existe. Si Docker está instalado, esto funciona hoy:
+
+```powershell
+docker compose run --rm java
+docker compose run --rm kotlin
+```
+
+Es, por ahora, la única forma de mostrar `gradle test` en vivo en esta máquina sin tocar la
+configuración de red de Windows. Ver [DOCKER.md](../DOCKER.md).
+
+### Si no hay Docker
 
 - **La guía web funciona igual.** Intenta correr Gradle y, al fallar, cae sola en la réplica simulada.
   Se nota solo en que la insignia de la terminal dice `respaldo` en vez de `JVM`. El recorrido

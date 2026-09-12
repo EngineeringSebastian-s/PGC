@@ -1,0 +1,146 @@
+# Entorno completo del repo en contenedores.
+#
+# Objetivo: que cualquier máquina con Docker pueda correr las ocho suítes sin
+# instalar ni un SDK. Cada servicio usa la imagen oficial de su lenguaje.
+#
+#   docker compose run --rm go          # una suite suelta
+#   docker compose up guia-web          # la guía en http://localhost:43141
+#   .\scripts\docker-correr-todo.ps1    # las ocho, con resumen
+#
+# Sobre los volúmenes anónimos (`- /app/node_modules`, `- /app/target`, ...):
+# enmascaran las carpetas de build del host. Sin eso, el contenedor Linux
+# levantaría los binarios nativos compilados para Windows y fallaría.
+
+name: pgc
+
+services:
+
+  # ---------------------------------------------------------------- punto 3
+
+  csharp:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/csharp-dotnet:/app
+      - csharp-nuget:/root/.nuget/packages
+      - /app/src/PlaylistManager/bin
+      - /app/src/PlaylistManager/obj
+      - /app/src/PlaylistManager.Cli/bin
+      - /app/src/PlaylistManager.Cli/obj
+      - /app/tests/PlaylistManager.Tests/bin
+      - /app/tests/PlaylistManager.Tests/obj
+    environment:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+    command: dotnet test --nologo
+
+  python:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/python:/app
+      - python-pip:/root/.cache/pip
+      - /app/venv
+      - /app/.pytest_cache
+    command: sh -c "pip install --quiet -r requirements.txt && pytest -v"
+
+  react:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/javascript-react:/app
+      - react-modules:/app/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npx vitest --run"
+
+  php:
+    build:
+      context: ./docker
+      dockerfile: php.Dockerfile
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/php:/app
+      - php-composer:/root/.composer/cache
+      - php-vendor:/app/vendor
+    command: sh -c "composer install --no-interaction --quiet && php vendor/bin/phpunit --testdox"
+
+  rust:
+    image: rust:1-slim-bookworm
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/rust:/app
+      - rust-registry:/usr/local/cargo/registry
+      - rust-target:/app/target
+    command: cargo test
+
+  go:
+    image: golang:1.27-alpine
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/go:/app
+      - go-modules:/go/pkg/mod
+      - go-build:/root/.cache/go-build
+    command: go test -v ./...
+
+  # ---------------------------------------------------------------- puntos 1 y 2
+
+  # En Linux, Gradle no sufre el error "Unable to establish loopback connection"
+  # que bloquea a estos dos proyectos en Windows. Se usa el gradle de la imagen
+  # en vez de ./gradlew para no re-descargar la distribución en cada máquina.
+  java:
+    image: gradle:8.14.3-jdk21
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/p1-java:/app
+      - gradle-cache:/home/gradle/.gradle
+      - /app/build
+      - /app/.gradle
+    command: gradle test --console=plain --no-daemon
+
+  kotlin:
+    image: gradle:8.14.3-jdk21
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/p1-kotlin:/app
+      - gradle-cache:/home/gradle/.gradle
+      - /app/build
+      - /app/.gradle
+      - /app/.kotlin
+    command: gradle test --console=plain --no-daemon
+
+  # ---------------------------------------------------------------- demos con UI
+
+  # Servicios de larga duración: se levantan con `docker compose up <nombre>`.
+
+  guia-web:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/guia-web:/app
+      - guia-modules:/app/node_modules
+      - /app/.next
+    ports:
+      - "43141:43141"
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --hostname 0.0.0.0"
+
+  react-ui:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ./PracticeOne/crud-tdd/javascript-react:/app
+      - react-modules:/app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+
+volumes:
+  csharp-nuget:
+  python-pip:
+  react-modules:
+  php-composer:
+  php-vendor:
+  rust-registry:
+  rust-target:
+  go-modules:
+  go-build:
+  gradle-cache:
+  guia-modules:
