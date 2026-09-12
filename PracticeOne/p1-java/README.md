@@ -35,7 +35,7 @@ El reporte HTML queda en `build/reports/tests/test/index.html`.
 
 > ⚠️ **Si falla con `Unable to establish loopback connection`** no es un problema del proyecto:
 > es la JVM de esa máquina, que no puede abrir un `Selector` de NIO. Ver
-> [la guía de exposición](../GUIA-EXPOSICION.md#problema-conocido-gradle-no-arranca-en-esta-máquina).
+> [la guía de exposición](../GUIDE.md#problema-conocido-gradle-no-arranca-en-esta-máquina).
 
 ---
 
