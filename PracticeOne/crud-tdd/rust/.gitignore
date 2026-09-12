@@ -1,1 +1,5 @@
+# Artefactos de compilación
 /target
+
+# Cargo.lock SÍ se versiona: este crate produce un binario, así que
+# fijar las versiones exactas es lo recomendado por Cargo.
