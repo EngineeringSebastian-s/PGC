@@ -42,7 +42,7 @@ de una.
 
 ## Para exponer
 
-👉 **[GUIA-EXPOSICION.md](GUIA-EXPOSICION.md)** — el guion completo: orden, qué mostrar en cada
+👉 **[GUIA-EXPOSICION.md](GUIDE.md)** — el guion completo: orden, qué mostrar en cada
 momento, qué comandos correr, qué decir en cada concepto y qué hacer si algo falla en vivo.
 
 ## Resumen de tests
