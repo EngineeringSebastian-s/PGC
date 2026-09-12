@@ -15,7 +15,7 @@ param()
 
 $ErrorActionPreference = 'Continue'
 
-# PHP instalado con winget no queda en el PATH: lo buscamos también en su carpeta.
+# PHP y cargo instalados con winget no siempre quedan en el PATH de la sesión.
 $rutasExtra = @(
     "$env:LOCALAPPDATA\Microsoft\WinGet\Packages\PHP.PHP.8.4_Microsoft.Winget.Source_8wekyb3d8bbwe",
     "$env:USERPROFILE\.cargo\bin"
@@ -25,137 +25,173 @@ foreach ($ruta in $rutasExtra) {
     if ($env:Path -notlike "*$ruta*") { $env:Path = "$env:Path;$ruta" }
 }
 
-function Test-Herramienta {
+$resultados = [System.Collections.Generic.List[object]]::new()
+
+function Add-Resultado {
     param(
-        [string]$Nombre,
-        [string]$Comando,
-        [string[]]$Args = @('--version'),
-        [string]$ComoInstalar,
-        [string]$ParaQue
+        [string]$Herramienta,
+        [ValidateSet('OK', 'FALTA', 'PARCIAL')][string]$Estado,
+        [string]$Detalle,
+        [string]$ParaQue,
+        [string]$ComoResolver = ''
     )
 
-    $encontrado = Get-Command $Comando -ErrorAction SilentlyContinue
-    $version = ''
-    $ok = $false
-
-    if ($encontrado) {
-        try {
-            $salida = & $Comando @Args 2>&1 | Select-Object -First 1
-            $version = ($salida | Out-String).Trim()
-            $ok = $true
-        } catch {
-            $version = 'instalado, pero no respondió'
-        }
-    }
-
-    [PSCustomObject]@{
-        Herramienta  = $Nombre
-        Estado       = if ($ok) { 'OK' } else { 'FALTA' }
-        Version      = $version
+    $resultados.Add([PSCustomObject]@{
+        Herramienta  = $Herramienta
+        Estado       = $Estado
+        Detalle      = $Detalle
         ParaQue      = $ParaQue
-        ComoInstalar = if ($ok) { '' } else { $ComoInstalar }
-    }
+        ComoResolver = $ComoResolver
+    })
 }
 
+function Get-PrimeraLinea {
+    param([string[]]$Salida)
+    $linea = @($Salida | Where-Object { "$_".Trim() -ne '' }) | Select-Object -First 1
+    return "$linea".Trim()
+}
+
+function Test-Simple {
+    param(
+        [string]$Herramienta,
+        [string]$Comando,
+        [string]$Flag = '--version',
+        [string]$ParaQue,
+        [string]$ComoResolver,
+        [scriptblock]$LimpiarVersion = { param($texto) $texto }
+    )
+
+    if (-not (Get-Command $Comando -ErrorAction SilentlyContinue)) {
+        Add-Resultado -Herramienta $Herramienta -Estado 'FALTA' -Detalle 'no está instalado' `
+            -ParaQue $ParaQue -ComoResolver $ComoResolver
+        return
+    }
+
+    try {
+        $salida = @(& $Comando $Flag 2>&1 | ForEach-Object { "$_" })
+        $version = & $LimpiarVersion (Get-PrimeraLinea $salida)
+    } catch {
+        $version = 'instalado'
+    }
+
+    Add-Resultado -Herramienta $Herramienta -Estado 'OK' -Detalle $version -ParaQue $ParaQue
+}
+
+Test-Simple -Herramienta 'Node.js' -Comando 'node' -ParaQue 'CRUD React + guía web' `
+    -ComoResolver 'winget install OpenJS.NodeJS.LTS'
+
+Test-Simple -Herramienta 'Python' -Comando 'python' -ParaQue 'CRUD Python' `
+    -ComoResolver 'winget install Python.Python.3.12' `
+    -LimpiarVersion { param($t) if ($t -match 'Python \d[\d.]*') { $Matches[0] } else { $t } }
+
+Test-Simple -Herramienta 'Rust (cargo)' -Comando 'cargo' -ParaQue 'CRUD Rust' `
+    -ComoResolver 'winget install Rustlang.Rustup' `
+    -LimpiarVersion { param($t) if ($t -match 'cargo \d[\d.]*') { $Matches[0] } else { $t } }
+
+Test-Simple -Herramienta 'PHP' -Comando 'php' -ParaQue 'CRUD PHP' `
+    -ComoResolver 'winget install PHP.PHP.8.4' `
+    -LimpiarVersion { param($t) if ($t -match 'PHP \d[\d.]*') { $Matches[0] } else { $t } }
+
+Test-Simple -Herramienta 'Composer' -Comando 'composer' -ParaQue 'CRUD PHP (dependencias)' `
+    -ComoResolver 'ver PracticeOne/crud-tdd/php/README.md' `
+    -LimpiarVersion { param($t) if ($t -match 'Composer version \S+') { $Matches[0] } else { 'instalado' } }
+
+# --- .NET: hace falta el SDK, no alcanza con el runtime ---
+if (Get-Command dotnet -ErrorAction SilentlyContinue) {
+    $sdks = @(& dotnet --list-sdks 2>$null | ForEach-Object { "$_" })
+    if ($sdks.Count -gt 0) {
+        $ultimo = ($sdks[$sdks.Count - 1] -split '\s+')[0]
+        Add-Resultado -Herramienta '.NET SDK' -Estado 'OK' -Detalle $ultimo -ParaQue 'CRUD C#'
+    } else {
+        Add-Resultado -Herramienta '.NET SDK' -Estado 'FALTA' -Detalle 'solo runtime, sin SDK' `
+            -ParaQue 'CRUD C#' -ComoResolver 'winget install Microsoft.DotNet.SDK.10'
+    }
+} else {
+    Add-Resultado -Herramienta '.NET SDK' -Estado 'FALTA' -Detalle 'no está instalado' `
+        -ParaQue 'CRUD C#' -ComoResolver 'winget install Microsoft.DotNet.SDK.10'
+}
+
+# --- Java: puede estar instalado sin estar en el PATH ---
+$javaExe = $null
+$jdkDirs = @(Get-ChildItem 'C:\Program Files\Java', 'C:\Program Files\Eclipse Adoptium', 'C:\Program Files\Microsoft' `
+        -Directory -ErrorAction SilentlyContinue |
+    Where-Object { Test-Path (Join-Path $_.FullName 'bin\java.exe') })
+
+if (Get-Command java -ErrorAction SilentlyContinue) {
+    $javaExe = (Get-Command java).Source
+    $version = Get-PrimeraLinea @(& java -version 2>&1 | ForEach-Object { "$_" })
+    Add-Resultado -Herramienta 'Java (JDK)' -Estado 'OK' -Detalle $version -ParaQue 'p1-java y p1-kotlin'
+} elseif ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'bin\java.exe'))) {
+    $javaExe = Join-Path $env:JAVA_HOME 'bin\java.exe'
+    Add-Resultado -Herramienta 'Java (JDK)' -Estado 'OK' -Detalle "por JAVA_HOME ($env:JAVA_HOME)" `
+        -ParaQue 'p1-java y p1-kotlin'
+} elseif ($jdkDirs.Count -gt 0) {
+    $javaExe = Join-Path $jdkDirs[0].FullName 'bin\java.exe'
+    Add-Resultado -Herramienta 'Java (JDK)' -Estado 'PARCIAL' -Detalle "instalado, pero fuera del PATH" `
+        -ParaQue 'p1-java y p1-kotlin' -ComoResolver "`$env:JAVA_HOME = '$($jdkDirs[0].FullName)'"
+} else {
+    Add-Resultado -Herramienta 'Java (JDK)' -Estado 'FALTA' -Detalle 'no está instalado' `
+        -ParaQue 'p1-java y p1-kotlin' -ComoResolver 'winget install Microsoft.OpenJDK.21'
+}
+
+# --- Salida ---
 Write-Host ''
 Write-Host '  Entorno del repo PGC' -ForegroundColor Cyan
 Write-Host '  --------------------' -ForegroundColor Cyan
+Write-Host ''
 
-$resultados = @(
-    Test-Herramienta -Nombre 'Node.js' -Comando 'node' -ParaQue 'CRUD React + guia-web' `
-        -ComoInstalar 'winget install OpenJS.NodeJS.LTS'
-    Test-Herramienta -Nombre 'Python' -Comando 'python' -ParaQue 'CRUD Python' `
-        -ComoInstalar 'winget install Python.Python.3.12'
-    Test-Herramienta -Nombre 'Rust (cargo)' -Comando 'cargo' -ParaQue 'CRUD Rust' `
-        -ComoInstalar 'winget install Rustlang.Rustup'
-    Test-Herramienta -Nombre 'PHP' -Comando 'php' -ParaQue 'CRUD PHP' `
-        -ComoInstalar 'winget install PHP.PHP.8.4'
-    Test-Herramienta -Nombre 'Composer' -Comando 'composer' -ParaQue 'CRUD PHP (dependencias)' `
-        -ComoInstalar 'ver PracticeOne/crud-tdd/php/README.md'
-)
-
-# .NET: hace falta el SDK, no alcanza con el runtime.
-$dotnet = Get-Command dotnet -ErrorAction SilentlyContinue
-$sdks = if ($dotnet) { @(& dotnet --list-sdks 2>$null) } else { @() }
-$resultados += [PSCustomObject]@{
-    Herramienta  = '.NET SDK'
-    Estado       = if ($sdks.Count -gt 0) { 'OK' } else { 'FALTA' }
-    Version      = if ($sdks.Count -gt 0) { ($sdks[-1] -split ' ')[0] } elseif ($dotnet) { 'solo runtime, sin SDK' } else { '' }
-    ParaQue      = 'CRUD C#'
-    ComoInstalar = if ($sdks.Count -gt 0) { '' } else { 'winget install Microsoft.DotNet.SDK.10' }
-}
-
-# Java: puede estar instalado sin estar en el PATH.
-$java = Get-Command java -ErrorAction SilentlyContinue
-$javaHome = $env:JAVA_HOME
-$javaDirs = @(Get-ChildItem 'C:\Program Files\Java' -Directory -ErrorAction SilentlyContinue |
-        Where-Object { Test-Path (Join-Path $_.FullName 'bin\java.exe') })
-
-$javaEstado = 'FALTA'
-$javaVersion = ''
-$javaFix = 'winget install Microsoft.OpenJDK.21'
-
-if ($java) {
-    $javaEstado = 'OK'
-    $javaVersion = ((& java -version 2>&1 | Select-Object -First 1) | Out-String).Trim()
-} elseif ($javaHome -and (Test-Path (Join-Path $javaHome 'bin\java.exe'))) {
-    $javaEstado = 'OK'
-    $javaVersion = "via JAVA_HOME: $javaHome"
-} elseif ($javaDirs.Count -gt 0) {
-    $javaEstado = 'PARCIAL'
-    $javaVersion = "instalado en $($javaDirs[0].FullName), pero no está en el PATH"
-    $javaFix = "`$env:JAVA_HOME = '$($javaDirs[0].FullName)'"
-}
-
-$resultados += [PSCustomObject]@{
-    Herramienta  = 'Java (JDK)'
-    Estado       = $javaEstado
-    Version      = $javaVersion
-    ParaQue      = 'p1-java y p1-kotlin'
-    ComoInstalar = if ($javaEstado -eq 'OK') { '' } else { $javaFix }
-}
-
-$resultados | Format-Table -AutoSize -Property Herramienta, Estado, Version, ParaQue
-
-$faltan = @($resultados | Where-Object { $_.Estado -ne 'OK' })
-if ($faltan.Count -gt 0) {
-    Write-Host '  Falta instalar:' -ForegroundColor Yellow
-    foreach ($f in $faltan) {
-        Write-Host ("    {0,-14} -> {1}" -f $f.Herramienta, $f.ComoInstalar) -ForegroundColor Yellow
+foreach ($r in $resultados) {
+    $color = switch ($r.Estado) {
+        'OK'      { 'Green' }
+        'PARCIAL' { 'Yellow' }
+        default   { 'Red' }
     }
-    Write-Host ''
-} else {
-    Write-Host '  Todo listo.' -ForegroundColor Green
-    Write-Host ''
+    $marca = switch ($r.Estado) {
+        'OK'      { '[ok] ' }
+        'PARCIAL' { '[~]  ' }
+        default   { '[X]  ' }
+    }
+    Write-Host ("  {0}{1,-14} {2,-34} {3}" -f $marca, $r.Herramienta, $r.Detalle, $r.ParaQue) -ForegroundColor $color
 }
 
-# --- Chequeos finos que rompen la demo aunque la herramienta esté instalada ---
+$pendientes = @($resultados | Where-Object { $_.Estado -ne 'OK' })
+if ($pendientes.Count -gt 0) {
+    Write-Host ''
+    Write-Host '  Para resolver:' -ForegroundColor Yellow
+    foreach ($p in $pendientes) {
+        Write-Host ("    {0,-14} {1}" -f $p.Herramienta, $p.ComoResolver) -ForegroundColor Yellow
+    }
+}
 
+# --- Chequeos finos: cosas que rompen la demo aunque la herramienta esté instalada ---
+Write-Host ''
 Write-Host '  Revisiones extra' -ForegroundColor Cyan
 Write-Host '  ----------------' -ForegroundColor Cyan
 
 if (Get-Command php -ErrorAction SilentlyContinue) {
     $ini = (& php --ini 2>&1 | Out-String)
-    if ($ini -match 'Loaded Configuration File:\s+\(none\)') {
-        Write-Host '  [!] PHP no carga ningún php.ini: Composer y PHPUnit van a fallar.' -ForegroundColor Yellow
-        Write-Host '      Ver PracticeOne/crud-tdd/php/README.md para crearlo.' -ForegroundColor Yellow
+    if ($ini -match 'Loaded Configuration File:\s*\(none\)') {
+        Write-Host '  [X]  PHP no carga ningún php.ini: Composer y PHPUnit van a fallar.' -ForegroundColor Red
+        Write-Host '       Cómo crearlo: PracticeOne/crud-tdd/php/README.md' -ForegroundColor Red
     } else {
-        $modulos = (& php -m 2>&1 | Out-String)
-        $faltantes = @('mbstring', 'openssl', 'zip') | Where-Object { $modulos -notmatch "(?im)^$_$" }
+        $modulos = @(& php -m 2>&1 | ForEach-Object { "$_".Trim() })
+        $faltantes = @('mbstring', 'openssl', 'zip') | Where-Object { $modulos -notcontains $_ }
         if ($faltantes.Count -gt 0) {
-            Write-Host "  [!] A PHP le faltan extensiones: $($faltantes -join ', ')" -ForegroundColor Yellow
+            Write-Host "  [X]  A PHP le faltan extensiones: $($faltantes -join ', ')" -ForegroundColor Red
+            Write-Host '       Cómo agregarlas: PracticeOne/crud-tdd/php/README.md' -ForegroundColor Red
         } else {
-            Write-Host '  [ok] PHP con php.ini y extensiones cargadas.' -ForegroundColor Green
+            Write-Host '  [ok] PHP carga php.ini con mbstring, openssl y zip.' -ForegroundColor Green
         }
     }
 }
 
-# Gradle necesita que la JVM pueda abrir un Selector de NIO sobre loopback.
-$javaExe = $null
-if ($java) { $javaExe = 'java' }
-elseif ($javaHome -and (Test-Path (Join-Path $javaHome 'bin\java.exe'))) { $javaExe = Join-Path $javaHome 'bin\java.exe' }
-elseif ($javaDirs.Count -gt 0) { $javaExe = Join-Path $javaDirs[0].FullName 'bin\java.exe' }
+if (Test-Path (Join-Path (Split-Path -Parent $PSScriptRoot) 'PracticeOne\crud-tdd\php\vendor')) {
+    Write-Host '  [ok] PHP con dependencias instaladas (vendor/).' -ForegroundColor Green
+} else {
+    Write-Host '  [~]  Falta correr "composer install" en crud-tdd/php.' -ForegroundColor Yellow
+}
 
+# Gradle necesita que la JVM pueda abrir un Selector de NIO sobre loopback.
 if ($javaExe) {
     $prueba = Join-Path $env:TEMP 'PgcSelectorCheck.java'
     @'
@@ -178,9 +214,9 @@ public class PgcSelectorCheck {
     if ($salida -match 'SELECTOR_OK') {
         Write-Host '  [ok] La JVM abre conexiones loopback: Gradle debería arrancar.' -ForegroundColor Green
     } else {
-        Write-Host '  [!] La JVM NO puede abrir un Selector de NIO sobre loopback.' -ForegroundColor Red
-        Write-Host '      Gradle va a fallar con "Unable to establish loopback connection".' -ForegroundColor Red
-        Write-Host '      Ver PracticeOne/GUIA-EXPOSICION.md (problema conocido).' -ForegroundColor Red
+        Write-Host '  [X]  La JVM NO puede abrir un Selector de NIO sobre loopback.' -ForegroundColor Red
+        Write-Host '       Gradle va a fallar con "Unable to establish loopback connection".' -ForegroundColor Red
+        Write-Host '       Ver PracticeOne/GUIA-EXPOSICION.md, sección "Problema conocido".' -ForegroundColor Red
     }
 }
 
