@@ -2,7 +2,7 @@
 
 use std::io::{self, Write};
 
-use crud_videojuegos::{ErrorCatalogo, RepositorioVideojuegos, Videojuego};
+use crud_videojuegos::{RepositorioVideojuegos, Videojuego};
 
 const MENU: &str = "
 --- Catalogo de Videojuegos ---
@@ -102,7 +102,6 @@ fn eliminar(repositorio: &mut RepositorioVideojuegos) {
 
     match repositorio.eliminar(id) {
         Ok(()) => println!("Videojuego eliminado."),
-        Err(error @ ErrorCatalogo::VideojuegoNoEncontrado(_)) => println!("Error: {error}"),
         Err(error) => println!("Error: {error}"),
     }
 }
