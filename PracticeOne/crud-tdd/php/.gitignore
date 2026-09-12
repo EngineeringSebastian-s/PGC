@@ -1,4 +1,12 @@
+# Dependencias instaladas por Composer
 /vendor/
-composer.lock
+
+# Caché de PHPUnit (se regenera en cada corrida)
 .phpunit.cache/
+.phpunit.result.cache
+
+# PHPUnit descargado suelto, como alternativa a Composer
 phpunit.phar
+
+# composer.lock SÍ se versiona: fija la versión exacta de PHPUnit
+# para que la suite corra igual en cualquier máquina.
