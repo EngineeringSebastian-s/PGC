@@ -16,7 +16,8 @@ Tiene que dar todo `[ok]`. Si algo falta, el propio script dice el comando para 
 > **Si vas a exponer desde otra máquina**, la vía corta es Docker: `.\scripts\docker-correr-todo.ps1`
 > corre las ocho suítes sin instalar ningún SDK. Bajá las imágenes **el día anterior**, no en el
 > momento. Ver [DOCKER.md](../DOCKER.md).
-> Si es la primera vez en esa máquina:
+
+Si es la primera vez en esa máquina:
 
 ```powershell
 .\scripts\preparar-entorno.ps1
@@ -35,7 +36,9 @@ Salida esperada: **`Todo verde: 6 suítes, 111 tests.`**
 
 1. Una terminal en la raíz del repo.
 2. `npm run dev` corriendo en `PracticeOne/guia-web` → <http://localhost:43141>.
-3. El editor con estos archivos ya abiertos en pestañas:
+3. La presentación del punto 3 servida, para el bloque 4:
+   `cd PracticeOne\crud-tdd\presentacion && node servidor.mjs` → <http://localhost:43142>
+4. El editor con estos archivos ya abiertos en pestañas:
     - `p1-java/src/test/java/practica/tdd/CalculatorTest.java`
     - `p1-java/src/test/java/practica/tdd/ecuacion/EcuacionPrimerGradoMockitoTest.java`
     - `crud-tdd/rust/tests/repositorio_videojuegos.rs`
@@ -243,6 +246,18 @@ Cerrá con la tabla:
 > "La consigna pedía tres: hicimos **seis**. Los tres obligatorios son C#, Python y React —React cubre
 > lo del framework de front—. PHP, Rust y Go se sumaron como extensión."
 
+### Lo que se proyecta
+
+Abrí <http://localhost:43142> (la presentación del punto 3). Tiene el recorrido armado: la
+consigna, el ciclo RED → GREEN con corridas reales de `go test`, y un explorador con las seis
+pestañas. En cada una está el código, el test y su salida.
+
+Con <kbd>←</kbd> <kbd>→</kbd> cambiás de lenguaje y con <kbd>R</kbd> corrés la suite en vivo
+delante de la clase. El selector **Local / Docker** de arriba elige el motor.
+
+> Si el servidor no está levantado, la página igual funciona y muestra las salidas capturadas:
+> el botón *Correr* se deshabilita solo. No hay forma de que quede en blanco.
+
 ### El momento fuerte: correr las seis suítes
 
 ```powershell
@@ -396,6 +411,7 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 |--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Gradle (`p1-java` / `p1-kotlin`)           | Ver la sección de abajo. **La guía web sigue funcionando igual**: cae sola en modo "respaldo".                                                                                |
 | La guía web no levanta                     | Mostrá los archivos de test directamente en el editor. El guion funciona igual.                                                                                               |
+| El servidor de la presentación no levanta | Abrí `PracticeOne/crud-tdd/presentacion/index.html` con doble clic: funciona offline con las salidas capturadas. |
 | `npm test` (React)                         | Corré `npx vitest --run`. Si `npm` da error de firma digital en PowerShell, usá `npm.cmd`.                                                                                    |
 | `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`.                                                                                                     |
 | `composer test` falla                      | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP).                                                                                                 |

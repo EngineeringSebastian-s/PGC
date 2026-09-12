@@ -1,0 +1,33 @@
+PHPUnit 11.5.56 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.24
+Configuration: C:\Users\Sebastian-EDU\Documents\GitHub\PGC\PracticeOne\crud-tdd\php\phpunit.xml
+
+..................                                                18 / 18 (100%)
+
+Time: 00:00.037, Memory: 8.00 MB
+
+Libro (Biblioteca\Tests\Libro)
+ ✔ Deberia crear libro con datos validos
+ ✔ Deberia lanzar invalid argument si titulo es vacio
+ ✔ Deberia lanzar invalid argument si autor es vacio
+ ✔ Deberia lanzar invalid argument si anio es menor a 1450
+ ✔ Deberia lanzar invalid argument si anio es mayor al actual
+
+Repositorio Libros (Biblioteca\Tests\RepositorioLibros)
+ ✔ Deberia crear libro y asignarle id autoincremental
+ ✔ Deberia incrementar id al crear varios libros
+ ✔ Deberia propagar error de validacion al crear con titulo vacio
+ ✔ Deberia obtener libro por id existente
+ ✔ Deberia lanzar libro no encontrado al buscar id inexistente
+ ✔ Deberia retornar lista vacia si no hay libros
+ ✔ Deberia retornar todos los libros registrados
+ ✔ Deberia actualizar libro existente con datos parciales
+ ✔ Deberia lanzar libro no encontrado al actualizar id inexistente
+ ✔ Deberia lanzar invalid argument al actualizar con titulo vacio
+ ✔ Deberia eliminar libro existente
+ ✔ Deberia lanzar libro no encontrado al eliminar id inexistente
+ ✔ Deberia no afectar otros libros al eliminar uno
+
+OK (18 tests, 25 assertions)
+

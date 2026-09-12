@@ -106,7 +106,7 @@ try {
     }
 
     $total = ($resumen | Measure-Object -Property Tests -Sum).Sum
-    Write-Host "  Todo verde: $($resumen.Count) suítes, $total tests. Sin un solo SDK instalado." -ForegroundColor Green
+    Write-Host "  Todo verde: $($resumen.Count) suítes, $total tests." -ForegroundColor Green
     Write-Host ''
 } finally {
     Pop-Location

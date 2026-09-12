@@ -1,0 +1,9 @@
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos están actualizados para la restauración.
+  PlaylistManager -> C:\Users\Sebastian-EDU\Documents\GitHub\PGC\PracticeOne\crud-tdd\csharp-dotnet\src\PlaylistManager\bin\Debug\net10.0\PlaylistManager.dll
+  PlaylistManager.Tests -> C:\Users\Sebastian-EDU\Documents\GitHub\PGC\PracticeOne\crud-tdd\csharp-dotnet\tests\PlaylistManager.Tests\bin\Debug\net10.0\PlaylistManager.Tests.dll
+Serie de pruebas para C:\Users\Sebastian-EDU\Documents\GitHub\PGC\PracticeOne\crud-tdd\csharp-dotnet\tests\PlaylistManager.Tests\bin\Debug\net10.0\PlaylistManager.Tests.dll (.NETCoreApp,Version=v10.0)
+1 archivos de prueba en total coincidieron con el patrón especificado.
+
+Correctas! - Con error:     0, Superado:    17, Omitido:     0, Total:    17, Duración: 118 ms - PlaylistManager.Tests.dll (net10.0)
+

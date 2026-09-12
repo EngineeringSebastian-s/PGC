@@ -1,0 +1,50 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests src\lib.rs (target\debug\deps\crud_videojuegos-a2be36562b11de78.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\crud_videojuegos-643d4803891358ae.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\repositorio_videojuegos.rs (target\debug\deps\repositorio_videojuegos-27ff1a87b6f70017.exe)
+
+running 13 tests
+test deberia_crear_videojuego_y_asignarle_id_autoincremental ... ok
+test deberia_eliminar_videojuego_existente ... ok
+test deberia_actualizar_videojuego_existente_con_datos_parciales ... ok
+test deberia_incrementar_id_al_crear_varios_videojuegos ... ok
+test deberia_no_afectar_otros_videojuegos_al_eliminar_uno ... ok
+test deberia_retornar_error_al_actualizar_id_inexistente ... ok
+test deberia_obtener_videojuego_por_id_existente ... ok
+test deberia_retornar_error_al_actualizar_con_titulo_vacio ... ok
+test deberia_retornar_error_al_buscar_id_inexistente ... ok
+test deberia_retornar_error_al_crear_videojuego_con_titulo_vacio ... ok
+test deberia_retornar_error_al_eliminar_id_inexistente ... ok
+test deberia_retornar_lista_vacia_si_no_hay_videojuegos ... ok
+test deberia_retornar_todos_los_videojuegos_registrados ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\videojuego.rs (target\debug\deps\videojuego-1194d5d739393722.exe)
+
+running 5 tests
+test deberia_crear_videojuego_con_datos_validos ... ok
+test deberia_retornar_error_si_titulo_es_vacio ... ok
+test deberia_retornar_error_si_estudio_es_vacio ... ok
+test deberia_retornar_error_si_anio_es_mayor_a_2100 ... ok
+test deberia_retornar_error_si_anio_es_menor_a_1958 ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests crud_videojuegos
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+

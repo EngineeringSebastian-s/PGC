@@ -1,0 +1,22 @@
+=== RUN   TestDeberiaRechazarDatosInvalidos
+=== RUN   TestDeberiaRechazarDatosInvalidos/titulo_vacio
+    pelicula_test.go:54: se esperaba ErrDatosInvalidos, se obtuvo: <nil>
+=== RUN   TestDeberiaRechazarDatosInvalidos/director_vacio
+=== RUN   TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888
+=== RUN   TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100
+=== RUN   TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa
+--- FAIL: TestDeberiaRechazarDatosInvalidos (0.00s)
+    --- FAIL: TestDeberiaRechazarDatosInvalidos/titulo_vacio (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/director_vacio (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888 (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100 (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio
+    repositorio_test.go:54: se esperaba ErrDatosInvalidos, se obtuvo: <nil>
+    repositorio_test.go:57: el repositorio deberia quedar vacio, tiene 1 peliculas
+--- FAIL: TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio (0.00s)
+FAIL
+FAIL	pgc/crud-peliculas	0.337s
+?   	pgc/crud-peliculas/cmd/cli	[no test files]
+FAIL
+

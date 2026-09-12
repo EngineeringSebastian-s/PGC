@@ -57,6 +57,7 @@ Detalle en 👉 **[DOCKER.md](DOCKER.md)**.
 | JUnit Java   | `PracticeOne/p1-java`                   | `.\gradlew.bat test` | —                                              |
 | JUnit Kotlin | `PracticeOne/p1-kotlin`                 | `.\gradlew.bat test` | —                                              |
 | Guía web     | `PracticeOne/guia-web`                  | —                    | `npm run dev` → <http://localhost:43141>       |
+| Presentación punto 3 | `PracticeOne/crud-tdd/presentacion` | — | abrir `index.html`, o `node servidor.mjs` |
 
 ## Requisitos
 
@@ -110,5 +111,6 @@ PGC/
         ├── javascript-react/       # Plantas de jardín       — Vitest + Testing Library
         ├── php/                    # Biblioteca de libros    — PHPUnit
         ├── rust/                   # Catálogo de videojuegos — cargo test
-        └── go/                     # Catálogo de películas    — go test
+        ├── go/                     # Catálogo de películas    — go test
+        └── presentacion/           # página para exponer el punto 3
 ```

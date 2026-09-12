@@ -1,0 +1,35 @@
+
+> javascript-react@0.0.0 test
+> vitest --run --reporter=verbose
+
+
+ RUN  v5.0.0 C:/Users/Sebastian-EDU/Documents/GitHub/PGC/PracticeOne/crud-tdd/javascript-react
+
+ ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_true_en_necesitaAgua_cuando_dias_es_igual_a_3 5ms
+ ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_true_en_necesitaAgua_cuando_dias_es_mayor_a_3 1ms
+ ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_false_en_necesitaAgua_cuando_dias_es_menor_a_3 1ms
+ ✓ src/domain/plantaUtils.test.ts > validarPlanta > deberia_lanzar_error_en_validarPlanta_si_nombre_es_vacio 1ms
+ ✓ src/domain/plantaUtils.test.ts > validarPlanta > deberia_lanzar_error_en_validarPlanta_si_dias_es_negativo 1ms
+ ✓ src/domain/plantaUtils.test.ts > validarPlanta > no_deberia_lanzar_error_en_validarPlanta_con_datos_validos 1ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_crear_planta_con_id_autogenerado_y_dias_en_cero 33ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_incrementar_id_al_crear_varias_plantas 5ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_lanzar_error_al_crear_planta_con_nombre_vacio 4ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerPlantaPorId > deberia_obtener_planta_por_id_existente 4ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerPlantaPorId > deberia_lanzar_error_al_obtener_planta_con_id_inexistente 5ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerTodas > deberia_retornar_todas_las_plantas_registradas 5ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - actualizarPlanta > deberia_actualizar_planta_existente 3ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - actualizarPlanta > deberia_lanzar_error_al_actualizar_planta_con_id_inexistente 2ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - regarPlanta > deberia_resetear_dias_desde_ultimo_riego_a_cero_al_regar_planta 7ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - eliminarPlanta > deberia_eliminar_planta_existente 4ms
+ ✓ src/domain/usePlantas.test.ts > usePlantas - eliminarPlanta > deberia_lanzar_error_al_eliminar_planta_con_id_inexistente 3ms
+ ✓ src/components/ListaPlantas.test.tsx > ListaPlantas > deberia_renderizar_una_tarjeta_por_cada_planta 73ms
+ ✓ src/components/ListaPlantas.test.tsx > ListaPlantas > deberia_mostrar_indicador_visual_cuando_planta_necesita_agua 10ms
+ ✓ src/components/FormularioPlanta.test.tsx > FormularioPlanta > deberia_llamar_a_onCrear_con_los_datos_ingresados_al_enviar_formulario 667ms
+ ✓ src/components/FormularioPlanta.test.tsx > FormularioPlanta > deberia_mostrar_mensaje_de_error_si_se_envia_formulario_con_nombre_vacio 65ms
+
+ Test Files  4 passed (4)
+      Tests  21 passed (21)
+   Start at  08:50:19
+   Duration  4.47s (environment 71%, setup 17%, tests 6%, transform 3%, import 2%, worker 1%)
+
+

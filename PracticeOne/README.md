@@ -19,6 +19,7 @@ Realizar los ejercicios que están en las siguientes páginas tal cual están ah
 | [`p1-kotlin/`](p1-kotlin) | 1     | El mismo ejercicio de JUnit 5, en Kotlin                      |
 | [`crud-tdd/`](crud-tdd)   | 3     | Seis CRUD con TDD: C#, Python, React, PHP, Rust y Go          |
 | [`guia-web/`](guia-web)   | 1 y 2 | Guía interactiva para proyectar durante la exposición         |
+| [`crud-tdd/presentacion/`](crud-tdd/presentacion) | 3 | Página para proyectar el punto 3: código, test y corrida |
 
 Cada carpeta tiene su propio README con los requisitos, el detalle de los tests y las notas técnicas.
 

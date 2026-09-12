@@ -1,0 +1,48 @@
+=== RUN   TestDeberiaCrearPeliculaConDatosValidos
+--- PASS: TestDeberiaCrearPeliculaConDatosValidos (0.00s)
+=== RUN   TestDeberiaRechazarDatosInvalidos
+=== RUN   TestDeberiaRechazarDatosInvalidos/titulo_vacio
+=== RUN   TestDeberiaRechazarDatosInvalidos/director_vacio
+=== RUN   TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888
+=== RUN   TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100
+=== RUN   TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa
+--- PASS: TestDeberiaRechazarDatosInvalidos (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/titulo_vacio (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/director_vacio (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888 (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100 (0.00s)
+    --- PASS: TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa (0.00s)
+=== RUN   TestDeberiaRecortarEspaciosEnTituloYDirector
+--- PASS: TestDeberiaRecortarEspaciosEnTituloYDirector (0.00s)
+=== RUN   TestDeberiaCrearPeliculaYAsignarleIDAutoincremental
+--- PASS: TestDeberiaCrearPeliculaYAsignarleIDAutoincremental (0.00s)
+=== RUN   TestDeberiaIncrementarIDAlCrearVariasPeliculas
+--- PASS: TestDeberiaIncrementarIDAlCrearVariasPeliculas (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio
+--- PASS: TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio (0.00s)
+=== RUN   TestDeberiaObtenerPeliculaPorIDExistente
+--- PASS: TestDeberiaObtenerPeliculaPorIDExistente (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlBuscarIDInexistente
+--- PASS: TestDeberiaRetornarErrorAlBuscarIDInexistente (0.00s)
+=== RUN   TestDeberiaRetornarListaVaciaSiNoHayPeliculas
+--- PASS: TestDeberiaRetornarListaVaciaSiNoHayPeliculas (0.00s)
+=== RUN   TestDeberiaRetornarTodasLasPeliculasRegistradas
+--- PASS: TestDeberiaRetornarTodasLasPeliculasRegistradas (0.00s)
+=== RUN   TestDeberiaActualizarPeliculaExistenteConDatosParciales
+--- PASS: TestDeberiaActualizarPeliculaExistenteConDatosParciales (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlActualizarIDInexistente
+--- PASS: TestDeberiaRetornarErrorAlActualizarIDInexistente (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlActualizarConTituloVacio
+--- PASS: TestDeberiaRetornarErrorAlActualizarConTituloVacio (0.00s)
+=== RUN   TestDeberiaEliminarPeliculaExistente
+--- PASS: TestDeberiaEliminarPeliculaExistente (0.00s)
+=== RUN   TestDeberiaRetornarErrorAlEliminarIDInexistente
+--- PASS: TestDeberiaRetornarErrorAlEliminarIDInexistente (0.00s)
+=== RUN   TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna
+--- PASS: TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna (0.00s)
+=== RUN   TestObtenerTodasNoDeberiaExponerElEstadoInterno
+--- PASS: TestObtenerTodasNoDeberiaExponerElEstadoInterno (0.00s)
+PASS
+ok  	pgc/crud-peliculas	(cached)
+?   	pgc/crud-peliculas/cmd/cli	[no test files]
+

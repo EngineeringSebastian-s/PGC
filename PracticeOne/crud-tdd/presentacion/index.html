@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRUD con TDD en seis lenguajes</title>
+<style>
+  :root {
+    --fondo: #f6f7f9;
+    --panel: #ffffff;
+    --borde: #dfe3e8;
+    --texto: #1a1d21;
+    --suave: #5b6470;
+    --acento: #2f5fd0;
+    --verde: #1a7f45;
+    --verde-suave: #e6f4ec;
+    --rojo: #c0392b;
+    --rojo-suave: #fdecea;
+    --term-fondo: #14171c;
+    --term-texto: #d6dbe3;
+    --term-verde: #6fd08c;
+    --term-rojo: #ff7b6b;
+    --term-gris: #7b8798;
+    --term-azul: #7fb3ff;
+    --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+      --fondo: #16181d; --panel: #1d2027; --borde: #2e333d; --texto: #e6e9ee;
+      --suave: #9aa4b2; --acento: #7fb3ff; --verde: #6fd08c; --verde-suave: #17301f;
+      --rojo: #ff7b6b; --rojo-suave: #331a17;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  /* Los hijos de un grid no bajan de su contenido salvo que se les fije
+     min-width: 0. Sin esto, un <pre> con líneas largas ensancha la columna y
+     la página entera scrollea en horizontal en vez de scrollear el bloque. */
+  .ciclo > *, .panel-lenguaje > *, .comparacion > *, .tarjetas > * { min-width: 0; }
+  body {
+    margin: 0; background: var(--fondo); color: var(--texto);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .envoltura { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ---------------------------------------------------------- encabezado */
+  header { padding: 56px 0 32px; border-bottom: 1px solid var(--borde); margin-bottom: 40px; }
+  .consigna {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--acento); margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.12; margin: 0 0 16px; letter-spacing: -.02em; }
+  .bajada { font-size: 19px; color: var(--suave); max-width: 62ch; margin: 0 0 26px; }
+  .cifras { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cifra {
+    background: var(--panel); border: 1px solid var(--borde); border-radius: 9px;
+    padding: 9px 15px; font-size: 14px;
+  }
+  .cifra b { font-size: 19px; margin-right: 7px; }
+
+  h2 {
+    font-size: 13px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--suave); margin: 0 0 18px;
+  }
+  section { margin-bottom: 56px; }
+  h3 { font-size: 21px; margin: 0 0 10px; letter-spacing: -.01em; }
+  p { margin: 0 0 14px; }
+  .apagado { color: var(--suave); }
+  code { font-family: var(--mono); font-size: .89em; background: rgba(127,139,158,.16); padding: 1px 5px; border-radius: 4px; }
+
+  /* ---------------------------------------------------------- el ejercicio */
+  .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 11px; padding: 18px 20px; }
+  .tarjeta h4 { margin: 0 0 7px; font-size: 15px; }
+  .tarjeta p { margin: 0; font-size: 14px; color: var(--suave); }
+  .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 23px; height: 23px; border-radius: 50%; background: var(--acento); color: #fff;
+    font-size: 12px; font-weight: 700; margin-right: 9px;
+  }
+
+  /* ---------------------------------------------------------- ciclo TDD */
+  .ciclo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 900px) { .ciclo { grid-template-columns: 1fr; } }
+  .fase { background: var(--panel); border: 1px solid var(--borde); border-radius: 11px; overflow: hidden; }
+  .fase > header {
+    padding: 13px 18px; margin: 0; border: 0; border-bottom: 1px solid var(--borde);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .punto { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .fase.rojo .punto { background: var(--rojo); }
+  .fase.verde .punto { background: var(--verde); }
+  .fase > header strong { font-size: 14px; letter-spacing: .04em; }
+  .fase > header span { font-size: 13px; color: var(--suave); }
+  .fase .cuerpo { padding: 16px 18px; font-size: 14px; color: var(--suave); }
+
+  /* ---------------------------------------------------------- código */
+  pre {
+    margin: 0; padding: 16px 18px; overflow-x: auto;
+    font-family: var(--mono); font-size: 13px; line-height: 1.55; tab-size: 4;
+    /* Sin ligaduras: en material didáctico, `<=` tiene que verse como dos
+       caracteres y no como "≤". */
+    font-variant-ligatures: none;
+  }
+  .codigo { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; }
+  .codigo > .ruta {
+    padding: 8px 16px; border-bottom: 1px solid var(--borde); font-family: var(--mono);
+    font-size: 12px; color: var(--suave); display: flex; justify-content: space-between; gap: 12px;
+  }
+  .tok-com { color: var(--suave); font-style: italic; }
+  .tok-str { color: #b5641e; }
+  .tok-kw  { color: #8250c4; font-weight: 600; }
+  .tok-num { color: #1a7f45; }
+  .tok-fn  { color: #2f5fd0; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) .tok-str { color: #e0a06a; }
+    :root:not([data-tema="claro"]) .tok-kw  { color: #c39bf5; }
+    :root:not([data-tema="claro"]) .tok-num { color: #6fd08c; }
+    :root:not([data-tema="claro"]) .tok-fn  { color: #7fb3ff; }
+  }
+
+  /* ---------------------------------------------------------- terminal */
+  .terminal { background: var(--term-fondo); border-radius: 10px; overflow: hidden; border: 1px solid #2b3038; }
+  .terminal > .barra {
+    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+    background: #1b1f26; border-bottom: 1px solid #2b3038;
+    font-family: var(--mono); font-size: 12px; color: var(--term-gris);
+  }
+  .semaforo { display: flex; gap: 6px; }
+  .semaforo i { width: 10px; height: 10px; border-radius: 50%; display: block; }
+  .terminal pre { color: var(--term-texto); max-height: 420px; overflow-y: auto; }
+  .terminal pre .ok   { color: var(--term-verde); }
+  .terminal pre .mal  { color: var(--term-rojo); }
+  .terminal pre .gris { color: var(--term-gris); }
+  .terminal pre .az   { color: var(--term-azul); }
+  .insignia {
+    margin-left: auto; font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+    padding: 2px 9px; border-radius: 20px; border: 1px solid currentColor;
+  }
+  .insignia.capturada { color: var(--term-gris); }
+  .insignia.vivo { color: var(--term-verde); }
+  .insignia.corriendo { color: var(--term-azul); }
+  .insignia.error { color: var(--term-rojo); }
+
+  /* ---------------------------------------------------------- explorador */
+  .pestanias { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+  .pestania {
+    background: var(--panel); border: 1px solid var(--borde); color: var(--texto);
+    border-radius: 9px; padding: 9px 15px; font: inherit; font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 9px; transition: border-color .12s, background .12s;
+  }
+  .pestania:hover { border-color: var(--acento); }
+  .pestania[aria-selected="true"] { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .pestania .n { font-size: 12px; opacity: .72; }
+
+  .panel-lenguaje { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 980px) { .panel-lenguaje { grid-template-columns: 1fr; } }
+  .encabezado-lenguaje {
+    grid-column: 1 / -1; background: var(--panel); border: 1px solid var(--borde);
+    border-radius: 11px; padding: 18px 22px;
+  }
+  .encabezado-lenguaje .fila { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .encabezado-lenguaje h3 { margin: 0; }
+  .marca {
+    font-size: 12px; padding: 2px 9px; border-radius: 20px; font-weight: 600;
+    border: 1px solid var(--borde); color: var(--suave);
+  }
+  .marca.excepciones { border-color: #b5641e; color: #b5641e; }
+  .marca.compilador { border-color: var(--verde); color: var(--verde); }
+  .marca.convencion { border-color: var(--acento); color: var(--acento); }
+  .columna-ancha { grid-column: 1 / -1; }
+  .bloque-titulo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
+  .bloque-titulo h4 { margin: 0; font-size: 14px; letter-spacing: .03em; text-transform: uppercase; color: var(--suave); }
+
+  .boton {
+    background: var(--acento); color: #fff; border: 0; border-radius: 8px;
+    padding: 9px 17px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .boton:disabled { opacity: .5; cursor: not-allowed; }
+  .boton.secundario { background: transparent; color: var(--texto); border: 1px solid var(--borde); font-weight: 500; }
+  .boton.secundario[aria-pressed="true"] { border-color: var(--acento); color: var(--acento); }
+
+  .nota {
+    background: var(--panel); border: 1px solid var(--borde); border-left: 3px solid var(--acento);
+    border-radius: 0 9px 9px 0; padding: 14px 18px; font-size: 14px; color: var(--suave);
+  }
+  .nota b, .nota code { color: var(--texto); }
+
+  /* ---------------------------------------------------------- barra de corrida */
+  .barra-corrida {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+    background: var(--panel); border: 1px solid var(--borde); border-radius: 11px;
+    padding: 13px 18px; margin-bottom: 20px;
+  }
+  .barra-corrida .estado { font-size: 13px; color: var(--suave); margin-left: auto; }
+  .motores { display: flex; gap: 6px; }
+
+  /* ---------------------------------------------------------- comparación */
+  .comparacion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 980px) { .comparacion { grid-template-columns: 1fr; } }
+  .postura { background: var(--panel); border: 1px solid var(--borde); border-radius: 11px; overflow: hidden; }
+  .postura > header { padding: 15px 18px; border: 0; margin: 0; border-bottom: 1px solid var(--borde); }
+  .postura > header h4 { margin: 0 0 4px; font-size: 15px; }
+  .postura > header p { margin: 0; font-size: 13px; color: var(--suave); }
+  .postura pre { font-size: 12.5px; }
+  .postura .pie { padding: 13px 18px; font-size: 13px; color: var(--suave); border-top: 1px solid var(--borde); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--borde); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--suave); font-weight: 600; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .tabla { background: var(--panel); border: 1px solid var(--borde); border-radius: 11px; overflow: hidden; }
+
+  footer { border-top: 1px solid var(--borde); padding-top: 26px; font-size: 14px; color: var(--suave); }
+  footer code { font-size: 13px; }
+  kbd {
+    font-family: var(--mono); font-size: 12px; border: 1px solid var(--borde);
+    border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--panel);
+  }
+</style>
+</head>
+<body>
+<div class="envoltura">
+
+<header>
+  <div class="consigna">Práctica 1 · Punto 3 · Pruebas y Gestión de la Configuración</div>
+  <h1>El mismo CRUD, seis veces,<br>escribiendo el test primero</h1>
+  <p class="bajada">
+    La consigna pedía un CRUD con TDD en tres lenguajes distintos, ninguno Java ni Kotlin, y al menos
+    uno con framework de front. Se hicieron seis. Lo interesante no es el CRUD: es lo que cada
+    lenguaje <i>te deja</i> y <i>no te deja</i> escribir en un test.
+  </p>
+  <div class="cifras">
+    <div class="cifra"><b>6</b>lenguajes</div>
+    <div class="cifra"><b>6</b>frameworks de test</div>
+    <div class="cifra"><b id="cifra-tests">111</b>tests, todos en verde</div>
+    <div class="cifra"><b>3</b>formas de probar un error</div>
+  </div>
+</header>
+
+<section>
+  <h2>De qué trata el ejercicio</h2>
+  <h3>Una entidad con reglas, un repositorio en memoria, y un test por cada regla</h3>
+  <p class="apagado" style="max-width:70ch">
+    Las seis implementaciones resuelven exactamente lo mismo. Esa repetición es deliberada: al fijar
+    el problema, lo único que varía entre proyectos es el lenguaje, y ahí se ve qué aporta cada uno.
+  </p>
+  <div class="tarjetas">
+    <div class="tarjeta"><h4><span class="num">1</span>Entidad validada</h4>
+      <p>Campos obligatorios y rango de año. Un solo lugar donde viven las reglas.</p></div>
+    <div class="tarjeta"><h4><span class="num">2</span>CRUD completo</h4>
+      <p>Crear, obtener por id, listar, actualizar parcial y eliminar.</p></div>
+    <div class="tarjeta"><h4><span class="num">3</span>Ids del repositorio</h4>
+      <p>Autoincrementales, asignados por el repositorio y no por quien llama.</p></div>
+    <div class="tarjeta"><h4><span class="num">4</span>Dos clases de error</h4>
+      <p>Datos inválidos y entidad no encontrada, siempre distinguibles en el test.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>El ciclo, con salidas reales</h2>
+  <h3>RED → GREEN, en Go</h3>
+  <p class="apagado" style="max-width:70ch">
+    Las dos terminales de abajo son corridas reales de <code>go test</code>. La primera es el estado
+    <b>RED</b>: el test de validación ya existe, pero <code>NuevaPelicula</code> todavía no rechaza el
+    título vacío. La segunda es después de agregar esas cuatro líneas.
+  </p>
+  <div class="ciclo">
+    <div class="fase rojo">
+      <header><span class="punto"></span><strong>RED</strong>
+        <span>el test falla porque el código aún no existe</span></header>
+      <div class="cuerpo">
+        Fijate que <b>solo falla la fila <code>titulo_vacio</code></b> de la tabla: las otras cuatro
+        pasan. Eso es lo que dan los subtests — la falla apunta al caso exacto.
+      </div>
+      <div id="term-rojo"></div>
+    </div>
+    <div class="fase verde">
+      <header><span class="punto"></span><strong>GREEN</strong>
+        <span>el mínimo código que lo hace pasar</span></header>
+      <div class="cuerpo">
+        Se agrega la guarda del título en el constructor. Nada más: lo elegante viene después, en
+        REFACTOR, ya con la red del test puesta.
+      </div>
+      <div id="term-verde"></div>
+    </div>
+  </div>
+  <div style="margin-top:18px" class="codigo">
+    <div class="ruta"><span>go/pelicula.go — lo que se agregó para pasar de RED a GREEN</span></div>
+    <pre class="tok-add">  <span class="tok-kw">if</span> titulo == <span class="tok-str">""</span> {
+      <span class="tok-kw">return</span> Pelicula{}, fmt.<span class="tok-fn">Errorf</span>(<span class="tok-str">"%w: el titulo no puede ser vacio"</span>, ErrDatosInvalidos)
+  }</pre>
+  </div>
+</section>
+
+<section>
+  <h2>Explorador</h2>
+  <h3>Código, test y corrida de cada lenguaje</h3>
+
+  <div class="barra-corrida">
+    <button class="boton" id="btn-correr">▶ Correr esta suite</button>
+    <div class="motores" role="group" aria-label="Motor de ejecución">
+      <button class="boton secundario" data-motor="local" aria-pressed="true">Local</button>
+      <button class="boton secundario" data-motor="docker" aria-pressed="false">Docker</button>
+    </div>
+    <div class="estado" id="estado-servidor">Comprobando el servidor…</div>
+  </div>
+
+  <div class="pestanias" id="pestanias" role="tablist"></div>
+  <div class="panel-lenguaje" id="panel"></div>
+</section>
+
+<section>
+  <h2>La conclusión</h2>
+  <h3>Tres formas de probar que algo falló</h3>
+  <p class="apagado" style="max-width:70ch">
+    Mismo caso de prueba en los seis proyectos —<i>pedir un id que no existe</i>— y tres posturas
+    distintas. Es el mejor resumen de por qué repetir el ejercicio valió la pena.
+  </p>
+  <div class="comparacion">
+    <div class="postura">
+      <header><h4>1 · Excepciones</h4><p>C#, Python, PHP, React</p></header>
+      <pre><span class="tok-kw">with</span> pytest.<span class="tok-fn">raises</span>(ViniloNoEncontradoError):
+    repositorio.<span class="tok-fn">obtener_por_id</span>(<span class="tok-num">999</span>)</pre>
+      <div class="pie">El error viaja por un canal aparte del valor de retorno, así que el test
+        necesita un mecanismo especial para capturarlo.</div>
+    </div>
+    <div class="postura">
+      <header><h4>2 · Valor, verificado por el compilador</h4><p>Rust</p></header>
+      <pre><span class="tok-kw">let</span> resultado = repositorio.<span class="tok-fn">obtener_por_id</span>(<span class="tok-num">999</span>);
+<span class="tok-fn">assert_eq!</span>(resultado, <span class="tok-kw">Err</span>(ErrorCatalogo::VideojuegoNoEncontrado(<span class="tok-num">999</span>)));</pre>
+      <div class="pie">El error <b>es</b> el resultado. Se compara con la misma aserción que el caso
+        feliz, y el compilador no te deja ignorarlo.</div>
+    </div>
+    <div class="postura">
+      <header><h4>3 · Valor, verificado por convención</h4><p>Go</p></header>
+      <pre>_, err := repositorio.<span class="tok-fn">ObtenerPorID</span>(<span class="tok-num">999</span>)
+
+<span class="tok-kw">if</span> !errors.<span class="tok-fn">Is</span>(err, catalogo.ErrNoEncontrada) {
+    t.<span class="tok-fn">Errorf</span>(<span class="tok-str">"se esperaba ErrNoEncontrada, se obtuvo: %v"</span>, err)
+}</pre>
+      <div class="pie">También es un valor, pero <code>repositorio.Eliminar(id)</code> a secas
+        compila igual. Acá <b>el test es la única red</b>.</div>
+    </div>
+  </div>
+
+  <div class="tabla" style="margin-top:20px">
+    <table>
+      <thead><tr><th>Lenguaje</th><th>Framework</th><th>Tema del CRUD</th><th>Tests</th><th>Cómo se prueba el error</th></tr></thead>
+      <tbody id="tabla-resumen"></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  <p><b>Cómo correr esto.</b> Abrí <code>index.html</code> en cualquier navegador y funciona:
+  el código y las salidas están embebidos.</p>
+  <p>Para que el botón <b>Correr</b> ejecute las suites de verdad, levantá el servidor local:</p>
+  <pre style="background:var(--panel);border:1px solid var(--borde);border-radius:9px;margin:10px 0 14px">node servidor.mjs</pre>
+  <p>Y abrí <code>http://localhost:43142</code>. El motor <b>Docker</b> corre cada suite en su imagen
+  oficial, sin necesidad de tener los SDK instalados.</p>
+  <p class="apagado" style="margin-top:18px">
+    Navegación: <kbd>←</kbd> <kbd>→</kbd> cambian de lenguaje · <kbd>R</kbd> corre la suite actual.
+    Las salidas embebidas se regeneran con <code>capturar.ps1</code> y <code>python generar.py</code>.
+  </p>
+</footer>
+
+</div>
+
+<script>
+const DATOS = {"lenguajes": [{"id": "csharp", "nombre": "C#", "stack": ".NET 10 · xUnit + FluentAssertions", "tema": "Playlist de canciones", "tests": 17, "postura": "excepciones", "resumen": "Es el único que prueba contra una <b>interfaz</b> (<code>ICancionRepository</code>) en vez de contra la clase concreta. Al actualizar, muta la entidad existente.", "lenguaje_codigo": "csharp", "dominio_archivo": "csharp-dotnet/src/PlaylistManager/CancionRepository.cs", "dominio": "private static void ValidarDatos(Cancion cancion)\n{\n    if (string.IsNullOrEmpty(cancion.Titulo))\n    {\n        throw new ArgumentException(\"El titulo no puede ser vacio o nulo\", nameof(cancion));\n    }\n\n    if (string.IsNullOrEmpty(cancion.Artista))\n    {\n        throw new ArgumentException(\"El artista no puede ser vacio o nulo\", nameof(cancion));\n    }\n\n    if (cancion.DuracionSegundos <= 0)\n    {\n        throw new ArgumentException(\"La duracion en segundos debe ser mayor a cero\", nameof(cancion));\n    }\n}", "prueba_archivo": "csharp-dotnet/tests/PlaylistManager.Tests/CancionRepositoryTests.cs", "prueba": "public void Deberia_LanzarCancionNoEncontradaException_AlObtenerPorId_SiNoExiste()\n{\n    var repositorio = new CancionRepository();\n\n    var accion = () => repositorio.ObtenerPorId(999);\n\n    accion.Should().Throw<CancionNoEncontradaException>();\n}", "nota": "FluentAssertions convierte la aserción en una frase: <code>accion.Should().Throw&lt;T&gt;()</code>. La acción se envuelve en un delegado porque la excepción tiene que saltar <i>adentro</i> de la aserción.", "comando": "dotnet test", "salida": "  Determinando los proyectos que se van a restaurar...\n  Todos los proyectos están actualizados para la restauración.\n  PlaylistManager -> C:\\Users\\Sebastian-EDU\\Documents\\GitHub\\PGC\\PracticeOne\\crud-tdd\\csharp-dotnet\\src\\PlaylistManager\\bin\\Debug\\net10.0\\PlaylistManager.dll\n  PlaylistManager.Tests -> C:\\Users\\Sebastian-EDU\\Documents\\GitHub\\PGC\\PracticeOne\\crud-tdd\\csharp-dotnet\\tests\\PlaylistManager.Tests\\bin\\Debug\\net10.0\\PlaylistManager.Tests.dll\nSerie de pruebas para C:\\Users\\Sebastian-EDU\\Documents\\GitHub\\PGC\\PracticeOne\\crud-tdd\\csharp-dotnet\\tests\\PlaylistManager.Tests\\bin\\Debug\\net10.0\\PlaylistManager.Tests.dll (.NETCoreApp,Version=v10.0)\n1 archivos de prueba en total coincidieron con el patrón especificado.\n\nCorrectas! - Con error:     0, Superado:    17, Omitido:     0, Total:    17, Duración: 118 ms - PlaylistManager.Tests.dll (net10.0)"}, {"id": "python", "nombre": "Python", "stack": "Python 3.12 · pytest", "tema": "Colección de vinilos", "tests": 16, "postura": "excepciones", "resumen": "Usa <code>@dataclass</code> y valida en <code>__post_init__</code>: la validación corre sola al construir el objeto, sin escribir un constructor a mano.", "lenguaje_codigo": "python", "dominio_archivo": "python/src/vinilo.py", "dominio": "@dataclass\nclass Vinilo:\n    id: int\n    album: str\n    artista: str\n    anio: int\n    genero: str\n\n    def __post_init__(self):\n        if not self.album:\n            raise ValueError(\"El album no puede ser vacio\")\n\n        if not self.artista:\n            raise ValueError(\"El artista no puede ser vacio\")\n\n        if self.anio < 1900 or self.anio > date.today().year:\n            raise ValueError(f\"El anio debe estar entre 1900 y {date.today().year}\")", "prueba_archivo": "python/tests/test_repositorio_vinilos.py", "prueba": "def test_deberia_lanzar_vinilo_no_encontrado_error_al_buscar_id_inexistente():\n    repositorio = RepositorioVinilos()\n\n    with pytest.raises(ViniloNoEncontradoError):\n        repositorio.obtener_por_id(999)", "nota": "<code>pytest.raises</code> es un context manager: el bloque <code>with</code> pasa si adentro se lanza esa excepción, y falla si no se lanza nada.", "comando": "pytest -v", "salida": "============================= test session starts =============================\ncollecting ... collected 16 items\n\ntests/test_repositorio_vinilos.py::test_deberia_crear_vinilo_y_asignarle_id_autoincremental PASSED [  6%]\ntests/test_repositorio_vinilos.py::test_deberia_incrementar_id_al_crear_varios_vinilos PASSED [ 12%]\ntests/test_repositorio_vinilos.py::test_deberia_obtener_vinilo_por_id_existente PASSED [ 18%]\ntests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_buscar_id_inexistente PASSED [ 25%]\ntests/test_repositorio_vinilos.py::test_deberia_retornar_lista_vacia_si_no_hay_vinilos PASSED [ 31%]\ntests/test_repositorio_vinilos.py::test_deberia_retornar_todos_los_vinilos_registrados PASSED [ 37%]\ntests/test_repositorio_vinilos.py::test_deberia_actualizar_vinilo_existente_con_datos_parciales PASSED [ 43%]\ntests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_actualizar_id_inexistente PASSED [ 50%]\ntests/test_repositorio_vinilos.py::test_deberia_eliminar_vinilo_existente PASSED [ 56%]\ntests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_eliminar_id_inexistente PASSED [ 62%]\ntests/test_repositorio_vinilos.py::test_deberia_no_afectar_otros_vinilos_al_eliminar_uno PASSED [ 68%]\ntests/test_vinilo.py::test_deberia_crear_vinilo_con_datos_validos PASSED [ 75%]\ntests/test_vinilo.py::test_deberia_lanzar_value_error_si_album_es_vacio PASSED [ 81%]\ntests/test_vinilo.py::test_deberia_lanzar_value_error_si_artista_es_vacio PASSED [ 87%]\ntests/test_vinilo.py::test_deberia_lanzar_value_error_si_anio_es_menor_a_1900 PASSED [ 93%]\ntests/test_vinilo.py::test_deberia_lanzar_value_error_si_anio_es_mayor_al_actual PASSED [100%]\n\n============================= 16 passed in 0.03s =============================="}, {"id": "react", "nombre": "TypeScript / React", "stack": "Vite · Vitest + Testing Library", "tema": "Plantas de jardín", "tests": 21, "postura": "excepciones", "resumen": "El único con <b>tests de interfaz</b>: además del dominio, renderiza componentes y simula al usuario. El repositorio vive dentro de un hook con estado de React.", "lenguaje_codigo": "typescript", "dominio_archivo": "javascript-react/src/domain/plantaUtils.ts", "dominio": "export function necesitaAgua(planta: Planta): boolean {\n    return planta.diasDesdeUltimoRiego >= 3\n}", "prueba_archivo": "javascript-react/src/components/ListaPlantas.test.tsx", "prueba": "describe('ListaPlantas', () => {\n    it('deberia_renderizar_una_tarjeta_por_cada_planta', () => {\n        render(<ListaPlantas plantas={plantas}/>)\n\n        expect(screen.getAllByTestId('tarjeta-planta')).toHaveLength(2)\n    })\n\n    it('deberia_mostrar_indicador_visual_cuando_planta_necesita_agua', () => {\n        render(<ListaPlantas plantas={plantas}/>)\n\n        expect(screen.getAllByTestId('indicador-necesita-agua')).toHaveLength(1)\n    })\n})", "nota": "Testing Library no inspecciona el estado interno del componente: busca lo que el usuario vería en pantalla. Por eso el test cuenta tarjetas renderizadas, no elementos de un array.", "comando": "npm test", "salida": "> javascript-react@0.0.0 test\n> vitest --run --reporter=verbose\n\n\n RUN  v5.0.0 C:/Users/Sebastian-EDU/Documents/GitHub/PGC/PracticeOne/crud-tdd/javascript-react\n\n ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_true_en_necesitaAgua_cuando_dias_es_igual_a_3 5ms\n ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_true_en_necesitaAgua_cuando_dias_es_mayor_a_3 1ms\n ✓ src/domain/plantaUtils.test.ts > necesitaAgua > deberia_retornar_false_en_necesitaAgua_cuando_dias_es_menor_a_3 1ms\n ✓ src/domain/plantaUtils.test.ts > validarPlanta > deberia_lanzar_error_en_validarPlanta_si_nombre_es_vacio 1ms\n ✓ src/domain/plantaUtils.test.ts > validarPlanta > deberia_lanzar_error_en_validarPlanta_si_dias_es_negativo 1ms\n ✓ src/domain/plantaUtils.test.ts > validarPlanta > no_deberia_lanzar_error_en_validarPlanta_con_datos_validos 1ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_crear_planta_con_id_autogenerado_y_dias_en_cero 33ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_incrementar_id_al_crear_varias_plantas 5ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - crearPlanta > deberia_lanzar_error_al_crear_planta_con_nombre_vacio 4ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerPlantaPorId > deberia_obtener_planta_por_id_existente 4ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerPlantaPorId > deberia_lanzar_error_al_obtener_planta_con_id_inexistente 5ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - obtenerTodas > deberia_retornar_todas_las_plantas_registradas 5ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - actualizarPlanta > deberia_actualizar_planta_existente 3ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - actualizarPlanta > deberia_lanzar_error_al_actualizar_planta_con_id_inexistente 2ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - regarPlanta > deberia_resetear_dias_desde_ultimo_riego_a_cero_al_regar_planta 7ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - eliminarPlanta > deberia_eliminar_planta_existente 4ms\n ✓ src/domain/usePlantas.test.ts > usePlantas - eliminarPlanta > deberia_lanzar_error_al_eliminar_planta_con_id_inexistente 3ms\n ✓ src/components/ListaPlantas.test.tsx > ListaPlantas > deberia_renderizar_una_tarjeta_por_cada_planta 73ms\n ✓ src/components/ListaPlantas.test.tsx > ListaPlantas > deberia_mostrar_indicador_visual_cuando_planta_necesita_agua 10ms\n ✓ src/components/FormularioPlanta.test.tsx > FormularioPlanta > deberia_llamar_a_onCrear_con_los_datos_ingresados_al_enviar_formulario 667ms\n ✓ src/components/FormularioPlanta.test.tsx > FormularioPlanta > deberia_mostrar_mensaje_de_error_si_se_envia_formulario_con_nombre_vacio 65ms\n\n Test Files  4 passed (4)\n      Tests  21 passed (21)\n   Start at  08:50:19\n   Duration  4.47s (environment 71%, setup 17%, tests 6%, transform 3%, import 2%, worker 1%)"}, {"id": "php", "nombre": "PHP", "stack": "PHP 8.4 · PHPUnit 11", "tema": "Biblioteca de libros", "tests": 18, "postura": "excepciones", "resumen": "La entidad es <b>inmutable</b> (<code>readonly</code>). Actualizar construye un objeto nuevo, así que si la actualización es inválida el original queda intacto.", "lenguaje_codigo": "php", "dominio_archivo": "php/src/Libro.php", "dominio": "public function __construct(\n    public readonly int $id,\n    public readonly string $titulo,\n    public readonly string $autor,\n    public readonly int $anio,\n    public readonly string $genero,\n) {\n    if (trim($titulo) === '') {\n        throw new InvalidArgumentException('El titulo no puede ser vacio');\n    }\n\n    if (trim($autor) === '') {\n        throw new InvalidArgumentException('El autor no puede ser vacio');\n    }\n\n    $anioActual = (int) date('Y');\n    if ($anio < self::ANIO_MINIMO || $anio > $anioActual) {\n        throw new InvalidArgumentException(\n            sprintf('El anio debe estar entre %d y %d', self::ANIO_MINIMO, $anioActual)\n        );\n    }\n}", "prueba_archivo": "php/tests/RepositorioLibrosTest.php", "prueba": "public function deberia_lanzar_invalid_argument_al_actualizar_con_titulo_vacio(): void\n{\n    $creado = $this->repositorio->crear('Rayuela', 'Julio Cortazar', 1963, 'Novela');\n\n    $this->expectException(InvalidArgumentException::class);\n\n    $this->repositorio->actualizar($creado->id, titulo: '');\n}", "nota": "<code>expectException</code> se declara <i>antes</i> de la acción. Este test además verifica el efecto colateral: que el libro original no se haya modificado.", "comando": "composer test", "salida": "PHPUnit 11.5.56 by Sebastian Bergmann and contributors.\n\nRuntime:       PHP 8.4.24\nConfiguration: C:\\Users\\Sebastian-EDU\\Documents\\GitHub\\PGC\\PracticeOne\\crud-tdd\\php\\phpunit.xml\n\n..................                                                18 / 18 (100%)\n\nTime: 00:00.037, Memory: 8.00 MB\n\nLibro (Biblioteca\\Tests\\Libro)\n ✔ Deberia crear libro con datos validos\n ✔ Deberia lanzar invalid argument si titulo es vacio\n ✔ Deberia lanzar invalid argument si autor es vacio\n ✔ Deberia lanzar invalid argument si anio es menor a 1450\n ✔ Deberia lanzar invalid argument si anio es mayor al actual\n\nRepositorio Libros (Biblioteca\\Tests\\RepositorioLibros)\n ✔ Deberia crear libro y asignarle id autoincremental\n ✔ Deberia incrementar id al crear varios libros\n ✔ Deberia propagar error de validacion al crear con titulo vacio\n ✔ Deberia obtener libro por id existente\n ✔ Deberia lanzar libro no encontrado al buscar id inexistente\n ✔ Deberia retornar lista vacia si no hay libros\n ✔ Deberia retornar todos los libros registrados\n ✔ Deberia actualizar libro existente con datos parciales\n ✔ Deberia lanzar libro no encontrado al actualizar id inexistente\n ✔ Deberia lanzar invalid argument al actualizar con titulo vacio\n ✔ Deberia eliminar libro existente\n ✔ Deberia lanzar libro no encontrado al eliminar id inexistente\n ✔ Deberia no afectar otros libros al eliminar uno\n\nOK (18 tests, 25 assertions)"}, {"id": "rust", "nombre": "Rust", "stack": "Rust 1.98 · cargo test (built-in)", "tema": "Catálogo de videojuegos", "tests": 18, "postura": "compilador", "resumen": "No tiene excepciones: el error viaja dentro de un <code>Result</code>, y el <b>compilador obliga</b> a quien llama a hacer algo con él.", "lenguaje_codigo": "rust", "dominio_archivo": "rust/src/videojuego.rs", "dominio": "pub fn nuevo(\n    id: u32,\n    titulo: &str,\n    estudio: &str,\n    anio: u16,\n    horas_jugadas: u32,\n) -> Result<Self, ErrorCatalogo> {\n    if titulo.trim().is_empty() {\n        return Err(ErrorCatalogo::DatosInvalidos(\n            \"El titulo no puede ser vacio\".to_string(),\n        ));\n    }\n\n    if estudio.trim().is_empty() {\n        return Err(ErrorCatalogo::DatosInvalidos(\n            \"El estudio no puede ser vacio\".to_string(),\n        ));\n    }\n\n    if !(ANIO_MINIMO..=ANIO_MAXIMO).contains(&anio) {\n        return Err(ErrorCatalogo::DatosInvalidos(format!(\n            \"El anio debe estar entre {ANIO_MINIMO} y {ANIO_MAXIMO}\"\n        )));\n    }\n\n    Ok(Videojuego {\n        id,\n        titulo: titulo.trim().to_string(),\n        estudio: estudio.trim().to_string(),\n        anio,\n        horas_jugadas,\n    })\n}", "prueba_archivo": "rust/tests/repositorio_videojuegos.rs", "prueba": "fn deberia_retornar_error_al_buscar_id_inexistente() {\n    let repositorio = repositorio_vacio();\n\n    let resultado = repositorio.obtener_por_id(999);\n\n    assert_eq!(resultado, Err(ErrorCatalogo::VideojuegoNoEncontrado(999)));\n}", "nota": "No hay <code>assertThrows</code> ni nada parecido: el error se compara con <code>assert_eq!</code>, la misma aserción que usa el caso feliz.", "comando": "cargo test", "salida": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s\n     Running unittests src\\lib.rs (target\\debug\\deps\\crud_videojuegos-a2be36562b11de78.exe)\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n     Running unittests src\\main.rs (target\\debug\\deps\\crud_videojuegos-643d4803891358ae.exe)\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n     Running tests\\repositorio_videojuegos.rs (target\\debug\\deps\\repositorio_videojuegos-27ff1a87b6f70017.exe)\n\nrunning 13 tests\ntest deberia_crear_videojuego_y_asignarle_id_autoincremental ... ok\ntest deberia_eliminar_videojuego_existente ... ok\ntest deberia_actualizar_videojuego_existente_con_datos_parciales ... ok\ntest deberia_incrementar_id_al_crear_varios_videojuegos ... ok\ntest deberia_no_afectar_otros_videojuegos_al_eliminar_uno ... ok\ntest deberia_retornar_error_al_actualizar_id_inexistente ... ok\ntest deberia_obtener_videojuego_por_id_existente ... ok\ntest deberia_retornar_error_al_actualizar_con_titulo_vacio ... ok\ntest deberia_retornar_error_al_buscar_id_inexistente ... ok\ntest deberia_retornar_error_al_crear_videojuego_con_titulo_vacio ... ok\ntest deberia_retornar_error_al_eliminar_id_inexistente ... ok\ntest deberia_retornar_lista_vacia_si_no_hay_videojuegos ... ok\ntest deberia_retornar_todos_los_videojuegos_registrados ... ok\n\ntest result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n     Running tests\\videojuego.rs (target\\debug\\deps\\videojuego-1194d5d739393722.exe)\n\nrunning 5 tests\ntest deberia_crear_videojuego_con_datos_validos ... ok\ntest deberia_retornar_error_si_titulo_es_vacio ... ok\ntest deberia_retornar_error_si_estudio_es_vacio ... ok\ntest deberia_retornar_error_si_anio_es_mayor_a_2100 ... ok\ntest deberia_retornar_error_si_anio_es_menor_a_1958 ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Doc-tests crud_videojuegos\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"}, {"id": "go", "nombre": "Go", "stack": "Go 1.27 · go test (built-in)", "tema": "Catálogo de películas", "tests": 21, "postura": "convencion", "resumen": "Tampoco tiene excepciones, pero <b>nadie obliga</b> a mirar el error. Y es el único donde los casos de validación se escriben como una <b>tabla</b>.", "lenguaje_codigo": "go", "dominio_archivo": "go/pelicula.go", "dominio": "func NuevaPelicula(id int, titulo, director string, anio, minutos int) (Pelicula, error) {\n\ttitulo = strings.TrimSpace(titulo)\n\tdirector = strings.TrimSpace(director)\n\n\tif titulo == \"\" {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: el titulo no puede ser vacio\", ErrDatosInvalidos)\n\t}\n\n\tif director == \"\" {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: el director no puede ser vacio\", ErrDatosInvalidos)\n\t}\n\n\tif anio < AnioMinimo || anio > AnioMaximo {\n\t\treturn Pelicula{}, fmt.Errorf(\n\t\t\t\"%w: el anio debe estar entre %d y %d\", ErrDatosInvalidos, AnioMinimo, AnioMaximo)\n\t}\n\n\tif minutos <= 0 {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: la duracion debe ser mayor a cero\", ErrDatosInvalidos)\n\t}\n\n\treturn Pelicula{\n\t\tID:       id,\n\t\tTitulo:   titulo,\n\t\tDirector: director,\n\t\tAnio:     anio,\n\t\tMinutos:  minutos,\n\t}, nil\n}", "prueba_archivo": "go/pelicula_test.go", "prueba": "func TestDeberiaRechazarDatosInvalidos(t *testing.T) {\n\tcasos := []struct {\n\t\tnombre   string\n\t\ttitulo   string\n\t\tdirector string\n\t\tanio     int\n\t\tminutos  int\n\t}{\n\t\t{\"titulo vacio\", \"   \", \"Andrei Tarkovski\", 1972, 167},\n\t\t{\"director vacio\", \"Solaris\", \"\", 1972, 167},\n\t\t{\"anio anterior a 1888\", \"Solaris\", \"Andrei Tarkovski\", 1887, 167},\n\t\t{\"anio posterior a 2100\", \"Solaris\", \"Andrei Tarkovski\", 2101, 167},\n\t\t{\"duracion cero o negativa\", \"Solaris\", \"Andrei Tarkovski\", 1972, 0},\n\t}\n\n\tfor _, caso := range casos {\n\t\tt.Run(caso.nombre, func(t *testing.T) {\n\t\t\t_, err := catalogo.NuevaPelicula(1, caso.titulo, caso.director, caso.anio, caso.minutos)\n\n\t\t\tif !errors.Is(err, catalogo.ErrDatosInvalidos) {\n\t\t\t\tt.Errorf(\"se esperaba ErrDatosInvalidos, se obtuvo: %v\", err)\n\t\t\t}\n\t\t})\n\t}\n}", "nota": "Table-driven test: una fila por caso y un <code>t.Run</code> por fila. Cada una se reporta con su propio nombre, así que agregar un caso de prueba es agregar una línea a la tabla.", "comando": "go test ./...", "salida": "=== RUN   TestDeberiaCrearPeliculaConDatosValidos\n--- PASS: TestDeberiaCrearPeliculaConDatosValidos (0.00s)\n=== RUN   TestDeberiaRechazarDatosInvalidos\n=== RUN   TestDeberiaRechazarDatosInvalidos/titulo_vacio\n=== RUN   TestDeberiaRechazarDatosInvalidos/director_vacio\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100\n=== RUN   TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa\n--- PASS: TestDeberiaRechazarDatosInvalidos (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/titulo_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/director_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa (0.00s)\n=== RUN   TestDeberiaRecortarEspaciosEnTituloYDirector\n--- PASS: TestDeberiaRecortarEspaciosEnTituloYDirector (0.00s)\n=== RUN   TestDeberiaCrearPeliculaYAsignarleIDAutoincremental\n--- PASS: TestDeberiaCrearPeliculaYAsignarleIDAutoincremental (0.00s)\n=== RUN   TestDeberiaIncrementarIDAlCrearVariasPeliculas\n--- PASS: TestDeberiaIncrementarIDAlCrearVariasPeliculas (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio\n--- PASS: TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio (0.00s)\n=== RUN   TestDeberiaObtenerPeliculaPorIDExistente\n--- PASS: TestDeberiaObtenerPeliculaPorIDExistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlBuscarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlBuscarIDInexistente (0.00s)\n=== RUN   TestDeberiaRetornarListaVaciaSiNoHayPeliculas\n--- PASS: TestDeberiaRetornarListaVaciaSiNoHayPeliculas (0.00s)\n=== RUN   TestDeberiaRetornarTodasLasPeliculasRegistradas\n--- PASS: TestDeberiaRetornarTodasLasPeliculasRegistradas (0.00s)\n=== RUN   TestDeberiaActualizarPeliculaExistenteConDatosParciales\n--- PASS: TestDeberiaActualizarPeliculaExistenteConDatosParciales (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlActualizarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlActualizarIDInexistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlActualizarConTituloVacio\n--- PASS: TestDeberiaRetornarErrorAlActualizarConTituloVacio (0.00s)\n=== RUN   TestDeberiaEliminarPeliculaExistente\n--- PASS: TestDeberiaEliminarPeliculaExistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlEliminarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlEliminarIDInexistente (0.00s)\n=== RUN   TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna\n--- PASS: TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna (0.00s)\n=== RUN   TestObtenerTodasNoDeberiaExponerElEstadoInterno\n--- PASS: TestObtenerTodasNoDeberiaExponerElEstadoInterno (0.00s)\nPASS\nok  \tpgc/crud-peliculas\t(cached)\n?   \tpgc/crud-peliculas/cmd/cli\t[no test files]"}], "ciclo": {"rojo_codigo": "func TestDeberiaRechazarDatosInvalidos(t *testing.T) {\n\tcasos := []struct {\n\t\tnombre   string\n\t\ttitulo   string\n\t\tdirector string\n\t\tanio     int\n\t\tminutos  int\n\t}{\n\t\t{\"titulo vacio\", \"   \", \"Andrei Tarkovski\", 1972, 167},\n\t\t{\"director vacio\", \"Solaris\", \"\", 1972, 167},\n\t\t{\"anio anterior a 1888\", \"Solaris\", \"Andrei Tarkovski\", 1887, 167},\n\t\t{\"anio posterior a 2100\", \"Solaris\", \"Andrei Tarkovski\", 2101, 167},\n\t\t{\"duracion cero o negativa\", \"Solaris\", \"Andrei Tarkovski\", 1972, 0},\n\t}\n\n\tfor _, caso := range casos {\n\t\tt.Run(caso.nombre, func(t *testing.T) {\n\t\t\t_, err := catalogo.NuevaPelicula(1, caso.titulo, caso.director, caso.anio, caso.minutos)\n\n\t\t\tif !errors.Is(err, catalogo.ErrDatosInvalidos) {\n\t\t\t\tt.Errorf(\"se esperaba ErrDatosInvalidos, se obtuvo: %v\", err)\n\t\t\t}\n\t\t})\n\t}\n}", "rojo_salida": "=== RUN   TestDeberiaRechazarDatosInvalidos\n=== RUN   TestDeberiaRechazarDatosInvalidos/titulo_vacio\n    pelicula_test.go:54: se esperaba ErrDatosInvalidos, se obtuvo: <nil>\n=== RUN   TestDeberiaRechazarDatosInvalidos/director_vacio\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100\n=== RUN   TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa\n--- FAIL: TestDeberiaRechazarDatosInvalidos (0.00s)\n    --- FAIL: TestDeberiaRechazarDatosInvalidos/titulo_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/director_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio\n    repositorio_test.go:54: se esperaba ErrDatosInvalidos, se obtuvo: <nil>\n    repositorio_test.go:57: el repositorio deberia quedar vacio, tiene 1 peliculas\n--- FAIL: TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio (0.00s)\nFAIL\nFAIL\tpgc/crud-peliculas\t0.337s\n?   \tpgc/crud-peliculas/cmd/cli\t[no test files]\nFAIL", "verde_codigo": "func NuevaPelicula(id int, titulo, director string, anio, minutos int) (Pelicula, error) {\n\ttitulo = strings.TrimSpace(titulo)\n\tdirector = strings.TrimSpace(director)\n\n\tif titulo == \"\" {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: el titulo no puede ser vacio\", ErrDatosInvalidos)\n\t}\n\n\tif director == \"\" {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: el director no puede ser vacio\", ErrDatosInvalidos)\n\t}\n\n\tif anio < AnioMinimo || anio > AnioMaximo {\n\t\treturn Pelicula{}, fmt.Errorf(\n\t\t\t\"%w: el anio debe estar entre %d y %d\", ErrDatosInvalidos, AnioMinimo, AnioMaximo)\n\t}\n\n\tif minutos <= 0 {\n\t\treturn Pelicula{}, fmt.Errorf(\"%w: la duracion debe ser mayor a cero\", ErrDatosInvalidos)\n\t}\n\n\treturn Pelicula{\n\t\tID:       id,\n\t\tTitulo:   titulo,\n\t\tDirector: director,\n\t\tAnio:     anio,\n\t\tMinutos:  minutos,\n\t}, nil\n}", "verde_salida": "=== RUN   TestDeberiaCrearPeliculaConDatosValidos\n--- PASS: TestDeberiaCrearPeliculaConDatosValidos (0.00s)\n=== RUN   TestDeberiaRechazarDatosInvalidos\n=== RUN   TestDeberiaRechazarDatosInvalidos/titulo_vacio\n=== RUN   TestDeberiaRechazarDatosInvalidos/director_vacio\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888\n=== RUN   TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100\n=== RUN   TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa\n--- PASS: TestDeberiaRechazarDatosInvalidos (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/titulo_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/director_vacio (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_anterior_a_1888 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/anio_posterior_a_2100 (0.00s)\n    --- PASS: TestDeberiaRechazarDatosInvalidos/duracion_cero_o_negativa (0.00s)\n=== RUN   TestDeberiaRecortarEspaciosEnTituloYDirector\n--- PASS: TestDeberiaRecortarEspaciosEnTituloYDirector (0.00s)\n=== RUN   TestDeberiaCrearPeliculaYAsignarleIDAutoincremental\n--- PASS: TestDeberiaCrearPeliculaYAsignarleIDAutoincremental (0.00s)\n=== RUN   TestDeberiaIncrementarIDAlCrearVariasPeliculas\n--- PASS: TestDeberiaIncrementarIDAlCrearVariasPeliculas (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio\n--- PASS: TestDeberiaRetornarErrorAlCrearPeliculaConTituloVacio (0.00s)\n=== RUN   TestDeberiaObtenerPeliculaPorIDExistente\n--- PASS: TestDeberiaObtenerPeliculaPorIDExistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlBuscarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlBuscarIDInexistente (0.00s)\n=== RUN   TestDeberiaRetornarListaVaciaSiNoHayPeliculas\n--- PASS: TestDeberiaRetornarListaVaciaSiNoHayPeliculas (0.00s)\n=== RUN   TestDeberiaRetornarTodasLasPeliculasRegistradas\n--- PASS: TestDeberiaRetornarTodasLasPeliculasRegistradas (0.00s)\n=== RUN   TestDeberiaActualizarPeliculaExistenteConDatosParciales\n--- PASS: TestDeberiaActualizarPeliculaExistenteConDatosParciales (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlActualizarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlActualizarIDInexistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlActualizarConTituloVacio\n--- PASS: TestDeberiaRetornarErrorAlActualizarConTituloVacio (0.00s)\n=== RUN   TestDeberiaEliminarPeliculaExistente\n--- PASS: TestDeberiaEliminarPeliculaExistente (0.00s)\n=== RUN   TestDeberiaRetornarErrorAlEliminarIDInexistente\n--- PASS: TestDeberiaRetornarErrorAlEliminarIDInexistente (0.00s)\n=== RUN   TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna\n--- PASS: TestDeberiaNoAfectarOtrasPeliculasAlEliminarUna (0.00s)\n=== RUN   TestObtenerTodasNoDeberiaExponerElEstadoInterno\n--- PASS: TestObtenerTodasNoDeberiaExponerElEstadoInterno (0.00s)\nPASS\nok  \tpgc/crud-peliculas\t(cached)\n?   \tpgc/crud-peliculas/cmd/cli\t[no test files]"}};
+
+/* ------------------------------------------------------------ coloreado */
+/* Resaltador mínimo, sin dependencias, para que el archivo sea autónomo.
+   Va en UNA sola pasada con un regex combinado: si se hiciera pasada por
+   pasada, la de números terminaría comiéndose los índices de los tokens ya
+   marcados. Por eso ninguno de estos patrones debe tener grupos de captura:
+   el índice del grupo que matcheó es el que elige la clase CSS. */
+const PALABRAS = {
+  go: /\b(?:func|return|if|else|for|range|package|import|type|struct|var|const|nil|error|string|int|bool|true|false|switch|case|default|defer|make|len|append|copy)\b/,
+  rust: /\b(?:fn|let|mut|pub|return|if|else|match|use|struct|enum|impl|Self|self|Ok|Err|Some|None|true|false|const|crate|mod|for|in|where)\b/,
+  python: /\b(?:def|return|if|elif|else|raise|import|from|class|self|not|and|or|in|is|None|True|False|for|while|with|as|try|except|pass|lambda)\b/,
+  csharp: /\b(?:public|private|static|void|return|if|else|new|class|var|string|int|bool|true|false|null|throw|using|namespace|readonly|foreach|in|this)\b/,
+  php: /\b(?:public|private|function|return|if|else|new|class|final|readonly|throw|use|namespace|declare|strict_types|const|true|false|null|foreach|as|array)\b/,
+  typescript: /\b(?:export|function|return|if|else|const|let|var|type|interface|import|from|new|throw|true|false|null|undefined|describe|it|expect)\b/,
+};
+const COMENTARIOS = {
+  go: /\/\/.*$/, rust: /\/\/.*$/, csharp: /\/\/.*$/, typescript: /\/\/.*$/,
+  python: /#.*$/, php: /(?:\/\/|#(?!\[)).*$|\/\*[\s\S]*?\*\//,
+};
+const CADENAS = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/;
+const LLAMADAS = /\b[A-Za-z_]\w*!?(?=\s*\()/;
+const NUMEROS = /\b\d[\d_]*(?:\.\d+)?\b/;
+
+const escapar = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const cacheRegex = new Map();
+
+function regexDe(lenguaje) {
+  if (cacheRegex.has(lenguaje)) return cacheRegex.get(lenguaje);
+  // El orden importa: ante dos alternativas que arrancan en la misma
+  // posición gana la primera, así `if (` se pinta como palabra clave y no
+  // como llamada a función.
+  const partes = [
+    ["tok-com", COMENTARIOS[lenguaje]],
+    ["tok-str", CADENAS],
+    ["tok-kw", PALABRAS[lenguaje]],
+    ["tok-fn", LLAMADAS],
+    ["tok-num", NUMEROS],
+  ].filter(([, rx]) => rx);
+
+  const entrada = {
+    clases: partes.map(([clase]) => clase),
+    regex: new RegExp(partes.map(([, rx]) => `(${rx.source})`).join("|"), "gm"),
+  };
+  cacheRegex.set(lenguaje, entrada);
+  return entrada;
+}
+
+function colorear(codigo, lenguaje) {
+  const {clases, regex} = regexDe(lenguaje);
+  regex.lastIndex = 0;
+
+  let salida = "", fin = 0, m;
+  while ((m = regex.exec(codigo)) !== null) {
+    if (m[0] === "") { regex.lastIndex++; continue; }
+    const cual = m.slice(1).findIndex((v) => v !== undefined);
+    salida += escapar(codigo.slice(fin, m.index));
+    salida += `<span class="${clases[cual]}">${escapar(m[0])}</span>`;
+    fin = m.index + m[0].length;
+  }
+  return salida + escapar(codigo.slice(fin));
+}
+
+/* Colorea la salida de una terminal según lo que significa cada línea. */
+function colorearSalida(texto) {
+  return texto.split("\n").map((linea) => {
+    const l = escapar(linea);
+    if (/\b(FAIL|FAILED|failed|error|Error:|✗|✘)\b/.test(linea) && !/0 failed|Failed:\s+0|; 0 failed/.test(linea))
+      return `<span class="mal">${l}</span>`;
+    if (/\b(ok|OK|PASS|PASSED|passed|Passed|✔|✓)\b/.test(linea))
+      return `<span class="ok">${l}</span>`;
+    if (/^\s*(===|---|\s*$)/.test(linea) || /^\s*\?\s/.test(linea))
+      return `<span class="gris">${l}</span>`;
+    return l;
+  }).join("\n");
+}
+
+function terminal({titulo, texto, insignia = "capturada", etiqueta = "salida capturada"}) {
+  return `<div class="terminal">
+    <div class="barra">
+      <span class="semaforo"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
+      <span>${escapar(titulo)}</span>
+      <span class="insignia ${insignia}">${escapar(etiqueta)}</span>
+    </div>
+    <pre>${colorearSalida(texto)}</pre>
+  </div>`;
+}
+
+/* ------------------------------------------------------------ ciclo TDD */
+document.getElementById("term-rojo").innerHTML =
+  terminal({titulo: "go test -run TestDeberiaRechazarDatosInvalidos", texto: DATOS.ciclo.rojo_salida});
+document.getElementById("term-verde").innerHTML =
+  terminal({titulo: "go test ./...", texto: DATOS.ciclo.verde_salida});
+
+/* ------------------------------------------------------------ explorador */
+const ETIQUETA_POSTURA = {excepciones: "excepciones", compilador: "Result + compilador", convencion: "error + convención"};
+const COMO_PRUEBA_ERROR = {
+  csharp: "<code>.Should().Throw&lt;T&gt;()</code>", python: "<code>pytest.raises</code>",
+  react: "<code>expect(...).toThrow</code>", php: "<code>expectException</code>",
+  rust: "<code>assert_eq!</code> sobre <code>Result</code>", go: "<code>errors.Is</code> sobre el <code>error</code>",
+};
+
+let actual = 0;
+const pestanias = document.getElementById("pestanias");
+const panel = document.getElementById("panel");
+
+DATOS.lenguajes.forEach((l, i) => {
+  const b = document.createElement("button");
+  b.className = "pestania";
+  b.setAttribute("role", "tab");
+  b.setAttribute("aria-selected", String(i === 0));
+  b.innerHTML = `${escapar(l.nombre)} <span class="n">${l.tests}</span>`;
+  b.onclick = () => seleccionar(i);
+  pestanias.appendChild(b);
+});
+
+function seleccionar(i) {
+  actual = i;
+  [...pestanias.children].forEach((b, j) => b.setAttribute("aria-selected", String(i === j)));
+  const l = DATOS.lenguajes[i];
+
+  panel.innerHTML = `
+    <div class="encabezado-lenguaje">
+      <div class="fila">
+        <h3>${escapar(l.nombre)}</h3>
+        <span class="marca ${l.postura}">${ETIQUETA_POSTURA[l.postura]}</span>
+        <span class="apagado" style="font-size:14px">${escapar(l.stack)}</span>
+      </div>
+      <p style="margin:0;font-size:15px">${l.resumen}</p>
+    </div>
+
+    <div>
+      <div class="bloque-titulo"><h4>El código</h4></div>
+      <div class="codigo">
+        <div class="ruta"><span>${escapar(l.dominio_archivo)}</span></div>
+        <pre>${colorear(l.dominio, l.lenguaje_codigo)}</pre>
+      </div>
+    </div>
+
+    <div>
+      <div class="bloque-titulo"><h4>El test</h4></div>
+      <div class="codigo">
+        <div class="ruta"><span>${escapar(l.prueba_archivo)}</span></div>
+        <pre>${colorear(l.prueba, l.lenguaje_codigo)}</pre>
+      </div>
+      <div class="nota" style="margin-top:14px">${l.nota}</div>
+    </div>
+
+    <div class="columna-ancha">
+      <div class="bloque-titulo"><h4>La corrida</h4>
+        <span class="apagado" style="font-size:13px;font-family:var(--mono)">${escapar(l.comando)}</span></div>
+      <div id="term-lenguaje">${terminal({titulo: l.comando, texto: l.salida})}</div>
+    </div>`;
+}
+
+seleccionar(0);
+
+/* tabla resumen */
+document.getElementById("tabla-resumen").innerHTML = DATOS.lenguajes.map((l) => `
+  <tr><td><b>${escapar(l.nombre)}</b></td><td>${escapar(l.stack.split(" · ")[1] || l.stack)}</td>
+  <td>${escapar(l.tema)}</td><td>${l.tests}</td><td>${COMO_PRUEBA_ERROR[l.id] || ""}</td></tr>`).join("");
+document.getElementById("cifra-tests").textContent =
+  DATOS.lenguajes.reduce((a, l) => a + l.tests, 0);
+
+/* ------------------------------------------------------------ corrida real */
+const btnCorrer = document.getElementById("btn-correr");
+const estadoServidor = document.getElementById("estado-servidor");
+let motor = "local";
+let servidorVivo = false;
+let corriendo = false;
+
+document.querySelectorAll("[data-motor]").forEach((b) => {
+  b.onclick = () => {
+    motor = b.dataset.motor;
+    document.querySelectorAll("[data-motor]").forEach((o) =>
+      o.setAttribute("aria-pressed", String(o.dataset.motor === motor)));
+  };
+});
+
+async function comprobarServidor() {
+  if (location.protocol === "file:") {
+    estadoServidor.innerHTML = "Modo offline · salidas capturadas. Para corridas reales: <code>node servidor.mjs</code>";
+    btnCorrer.disabled = true;
+    return;
+  }
+  try {
+    const r = await fetch("api/estado", {cache: "no-store"});
+    const datos = await r.json();
+    servidorVivo = true;
+    const dock = datos.docker ? "" : " · Docker no disponible";
+    estadoServidor.textContent = `Servidor conectado${dock}`;
+    if (!datos.docker) document.querySelector('[data-motor="docker"]').disabled = true;
+  } catch {
+    estadoServidor.innerHTML = "Sin servidor · salidas capturadas. Para corridas reales: <code>node servidor.mjs</code>";
+    btnCorrer.disabled = true;
+  }
+}
+comprobarServidor();
+
+async function correr() {
+  if (!servidorVivo || corriendo) return;
+  const l = DATOS.lenguajes[actual];
+  const contenedor = document.getElementById("term-lenguaje");
+
+  corriendo = true;
+  btnCorrer.disabled = true;
+  btnCorrer.textContent = "⏳ Corriendo…";
+
+  let lineas = [];
+  const pintar = (insignia, etiqueta) => {
+    contenedor.innerHTML = terminal({
+      titulo: `${motor === "docker" ? "docker · " : ""}${l.comando}`,
+      texto: lineas.join("\n"), insignia, etiqueta,
+    });
+    const pre = contenedor.querySelector("pre");
+    pre.scrollTop = pre.scrollHeight;
+  };
+
+  lineas.push(`$ ${motor === "docker" ? `docker compose run --rm ${l.id}` : l.comando}`);
+  pintar("corriendo", "corriendo…");
+
+  const fuente = new EventSource(`api/correr?suite=${encodeURIComponent(l.id)}&motor=${motor}`);
+
+  fuente.addEventListener("linea", (e) => {
+    lineas.push(JSON.parse(e.data).texto);
+    pintar("corriendo", "corriendo…");
+  });
+
+  fuente.addEventListener("fin", (e) => {
+    const {codigo, segundos} = JSON.parse(e.data);
+    lineas.push("", codigo === 0
+      ? `✔ terminó bien (código ${codigo}) en ${segundos}s`
+      : `✘ terminó con código ${codigo} en ${segundos}s`);
+    pintar(codigo === 0 ? "vivo" : "error", codigo === 0 ? "corrida real" : "falló");
+    cerrar();
+  });
+
+  fuente.addEventListener("fallo", (e) => {
+    lineas.push("", `✘ ${JSON.parse(e.data).mensaje}`);
+    pintar("error", "error");
+    cerrar();
+  });
+
+  fuente.onerror = () => { if (corriendo) { lineas.push("", "✘ se cortó la conexión con el servidor"); pintar("error", "error"); cerrar(); } };
+
+  function cerrar() {
+    fuente.close();
+    corriendo = false;
+    btnCorrer.disabled = false;
+    btnCorrer.textContent = "▶ Correr esta suite";
+  }
+}
+
+btnCorrer.onclick = correr;
+
+/* ------------------------------------------------------------ teclado */
+document.addEventListener("keydown", (e) => {
+  if (e.target.matches("input, textarea")) return;
+  if (e.key === "ArrowRight") seleccionar((actual + 1) % DATOS.lenguajes.length);
+  if (e.key === "ArrowLeft") seleccionar((actual - 1 + DATOS.lenguajes.length) % DATOS.lenguajes.length);
+  if (e.key === "r" || e.key === "R") correr();
+});
+</script>
+</body>
+</html>

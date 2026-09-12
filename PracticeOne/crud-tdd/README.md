@@ -49,6 +49,13 @@ Esa repetición es deliberada: permite abrir dos lenguajes al lado y comparar ca
 Cada carpeta tiene su propio README con los requisitos, la lista ordenada de casos TDD y las notas
 técnicas de esa implementación.
 
+## Para exponer
+
+👉 **[`presentacion/index.html`](presentacion)** — una página que recorre el ejercicio: la consigna,
+el ciclo RED → GREEN con corridas reales, y por cada lenguaje el código, el test y su salida.
+Se abre con doble clic y funciona offline. Con `node servidor.mjs` el botón *Correr* ejecuta las
+suites de verdad, en local o en Docker.
+
 ## Qué cambia de un lenguaje a otro
 
 El valor de repetir el ejercicio está en lo que **no** se puede repetir igual:

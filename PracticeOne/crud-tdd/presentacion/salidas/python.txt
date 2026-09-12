@@ -1,0 +1,22 @@
+============================= test session starts =============================
+collecting ... collected 16 items
+
+tests/test_repositorio_vinilos.py::test_deberia_crear_vinilo_y_asignarle_id_autoincremental PASSED [  6%]
+tests/test_repositorio_vinilos.py::test_deberia_incrementar_id_al_crear_varios_vinilos PASSED [ 12%]
+tests/test_repositorio_vinilos.py::test_deberia_obtener_vinilo_por_id_existente PASSED [ 18%]
+tests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_buscar_id_inexistente PASSED [ 25%]
+tests/test_repositorio_vinilos.py::test_deberia_retornar_lista_vacia_si_no_hay_vinilos PASSED [ 31%]
+tests/test_repositorio_vinilos.py::test_deberia_retornar_todos_los_vinilos_registrados PASSED [ 37%]
+tests/test_repositorio_vinilos.py::test_deberia_actualizar_vinilo_existente_con_datos_parciales PASSED [ 43%]
+tests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_actualizar_id_inexistente PASSED [ 50%]
+tests/test_repositorio_vinilos.py::test_deberia_eliminar_vinilo_existente PASSED [ 56%]
+tests/test_repositorio_vinilos.py::test_deberia_lanzar_vinilo_no_encontrado_error_al_eliminar_id_inexistente PASSED [ 62%]
+tests/test_repositorio_vinilos.py::test_deberia_no_afectar_otros_vinilos_al_eliminar_uno PASSED [ 68%]
+tests/test_vinilo.py::test_deberia_crear_vinilo_con_datos_validos PASSED [ 75%]
+tests/test_vinilo.py::test_deberia_lanzar_value_error_si_album_es_vacio PASSED [ 81%]
+tests/test_vinilo.py::test_deberia_lanzar_value_error_si_artista_es_vacio PASSED [ 87%]
+tests/test_vinilo.py::test_deberia_lanzar_value_error_si_anio_es_menor_a_1900 PASSED [ 93%]
+tests/test_vinilo.py::test_deberia_lanzar_value_error_si_anio_es_mayor_al_actual PASSED [100%]
+
+============================= 16 passed in 0.03s ==============================
+
