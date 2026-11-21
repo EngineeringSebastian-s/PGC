@@ -22,7 +22,7 @@ export default defineConfig({
                 channel: 'chromium',
                 viewport: null,
                 launchOptions: {
-                    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                    args: ['--start-maximized'],
                 }
             },
         },
