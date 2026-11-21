@@ -27,15 +27,15 @@ corridas registradas. **Nunca queda vacía**: en el peor caso, es la versión es
 
 ## Qué contiene
 
-| Sección | Contenido |
-|---------|-----------|
-| **La consigna** | Los tres puntos del enunciado y dónde se resolvió cada uno. |
-| **Qué es TDD** | El ciclo RED → GREEN → REFACTOR, y el ciclo aplicado con dos corridas reales de `go test`: el test fallando porque falta la validación, y pasando después de agregarla. |
-| **Punto 1** | Los ejercicios de JUnit 5: qué resuelve cada API, el código de los tests en Java y en Kotlin, las tres diferencias entre ambos, y las dos corridas. |
-| **Punto 2** | La ecuación de primer grado: por qué está partida en dos clases, los tres archivos de test, el test con mock frente al de integración, y la comparación entre ambos tipos. |
-| **Punto 3** | El modelo funcional común y, por cada uno de los seis lenguajes, una ficha con qué gestiona el CRUD, la entidad y sus campos, las reglas de validación, las operaciones y los errores del dominio; más el código, el test y la corrida. Cierra con las tres formas de probar un error. |
-| **Resultados** | Los 137 casos de prueba, por proyecto. |
-| **Conclusiones** | Las tres conclusiones de la práctica. |
+| Sección          | Contenido                                                                                                                                                                                                                                                                              |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **La consigna**  | Los tres puntos del enunciado y dónde se resolvió cada uno.                                                                                                                                                                                                                            |
+| **Qué es TDD**   | El ciclo RED → GREEN → REFACTOR, y el ciclo aplicado con dos corridas reales de `go test`: el test fallando porque falta la validación, y pasando después de agregarla.                                                                                                                |
+| **Punto 1**      | Los ejercicios de JUnit 5: qué resuelve cada API, el código de los tests en Java y en Kotlin, las tres diferencias entre ambos, y las dos corridas.                                                                                                                                    |
+| **Punto 2**      | La ecuación de primer grado: por qué está partida en dos clases, los tres archivos de test, el test con mock frente al de integración, y la comparación entre ambos tipos.                                                                                                             |
+| **Punto 3**      | El modelo funcional común y, por cada uno de los seis lenguajes, una ficha con qué gestiona el CRUD, la entidad y sus campos, las reglas de validación, las operaciones y los errores del dominio; más el código, el test y la corrida. Cierra con las tres formas de probar un error. |
+| **Resultados**   | Los 137 casos de prueba, por proyecto.                                                                                                                                                                                                                                                 |
+| **Conclusiones** | Las tres conclusiones de la práctica.                                                                                                                                                                                                                                                  |
 
 En el punto 3, <kbd>←</kbd> <kbd>→</kbd> cambian de lenguaje y <kbd>R</kbd> corre la suite.
 
@@ -49,14 +49,14 @@ archivos fuente de verdad, así que la presentación no puede quedar desincroniz
 python generar.py   # arma index.html con el código real + esas salidas
 ```
 
-| Archivo | Qué es |
-|---------|--------|
-| `index.html` | **El entregable.** Generado; autocontenido. |
-| `plantilla.html` | La fuente: HTML, estilos y lógica. Acá se edita el diseño y los textos. |
-| `generar.py` | Extrae los fragmentos del código real, arma los datos e inyecta todo en la plantilla. |
-| `capturar.ps1` | Corre las suites y guarda la salida real en `salidas/`. |
-| `salidas/*.txt` | Las corridas registradas, versionadas para que el modo sin servidor funcione. |
-| `servidor.mjs` | Servidor local para la ejecución en vivo. Node sin dependencias. |
+| Archivo          | Qué es                                                                                |
+|------------------|---------------------------------------------------------------------------------------|
+| `index.html`     | **El entregable.** Generado; autocontenido.                                           |
+| `plantilla.html` | La fuente: HTML, estilos y lógica. Acá se edita el diseño y los textos.               |
+| `generar.py`     | Extrae los fragmentos del código real, arma los datos e inyecta todo en la plantilla. |
+| `capturar.ps1`   | Corre las suites y guarda la salida real en `salidas/`.                               |
+| `salidas/*.txt`  | Las corridas registradas, versionadas para que el modo sin servidor funcione.         |
+| `servidor.mjs`   | Servidor local para la ejecución en vivo. Node sin dependencias.                      |
 
 Un par de detalles del pipeline:
 

@@ -292,11 +292,10 @@ Todo verde: 6 suítes, 111 tests.
 ### Lo interesante: lo que no se pudo repetir igual
 
 Esta es la parte que da nota. Abrí tres archivos al lado:
-**`crud-tdd/python/tests/test_repositorio_vinilos.py`**,
-**`crud-tdd/rust/tests/repositorio_videojuegos.rs`** y
-**`crud-tdd/go/repositorio_test.go`**.
+**`crud-tdd/python/tests/test_repositorio_vinilos.py`**, **`crud-tdd/rust/tests/repositorio_videojuegos.rs`** y **
+`crud-tdd/go/repositorio_test.go`**.
 
-Mismo caso de prueba —*pedir un id que no existe*— y tres posturas distintas.
+Mismo caso de prueba — *pedir un id que no existe*— y tres posturas distintas.
 
 **1. Excepciones** (Python, C#, PHP, React). El error viaja por un canal aparte del valor de retorno,
 así que el test necesita un mecanismo especial para capturarlo:
@@ -411,7 +410,7 @@ Crear (1), listar (2), eliminar (5), listar (2). Y para la UI, `npm run dev` en 
 |--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Gradle (`p1-java` / `p1-kotlin`)           | Ver la sección de abajo. **La guía web sigue funcionando igual**: cae sola en modo "respaldo".                                                                                |
 | La guía web no levanta                     | Mostrá los archivos de test directamente en el editor. El guion funciona igual.                                                                                               |
-| El servidor de la presentación no levanta | Abrí `PracticeOne/crud-tdd/presentacion/index.html` con doble clic: funciona offline con las salidas capturadas. |
+| El servidor de la presentación no levanta  | Abrí `PracticeOne/crud-tdd/presentacion/index.html` con doble clic: funciona offline con las salidas capturadas.                                                              |
 | `npm test` (React)                         | Corré `npx vitest --run`. Si `npm` da error de firma digital en PowerShell, usá `npm.cmd`.                                                                                    |
 | `dotnet test` dice que no encuentra el SDK | Está el runtime pero no el SDK: `winget install Microsoft.DotNet.SDK.10`.                                                                                                     |
 | `composer test` falla                      | Revisá `php --ini`. Si dice `(none)`, falta el `php.ini` (ver README de PHP).                                                                                                 |

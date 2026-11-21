@@ -26,8 +26,8 @@ validaciones, construido test a test.
 Las seis implementaciones resuelven lo mismo:
 
 - una **entidad** con validaciones (campos obligatorios, rango de año);
-- un **repositorio en memoria** con las cinco operaciones: crear, obtener por id, listar, actualizar
-  (parcial) y eliminar;
+- un **repositorio en memoria** con las cinco operaciones: crear, obtener por id, listar, actualizar (parcial) y
+  eliminar;
 - **ids autoincrementales** asignados por el repositorio, no por quien llama;
 - **dos clases de error** bien separadas: datos inválidos vs. entidad no encontrada;
 - una **CLI o UI** para demostrarlo a mano, además de la suite automatizada.
@@ -54,8 +54,8 @@ técnicas de esa implementación.
 👉 **[`presentacion/index.html`](presentacion)** — una página que recorre la práctica completa
 punto por punto. Para el punto 3 trae una ficha funcional de cada CRUD (qué gestiona, la entidad
 y sus campos, las reglas de validación, las operaciones y los errores) junto al código, el test y
-su corrida. Se abre con doble clic y funciona sin servidor; con `node servidor.mjs`, el botón
-*Correr* ejecuta las suites de verdad, en local o en Docker.
+su corrida. Se abre con doble clic y funciona sin servidor; con `node servidor.mjs`, el botón *Correr* ejecuta las
+suites de verdad, en local o en Docker.
 
 ## Qué cambia de un lenguaje a otro
 

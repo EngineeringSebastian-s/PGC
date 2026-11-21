@@ -106,7 +106,7 @@ Por eso **conviven los dos caminos** y ninguno reemplaza al otro:
 | Requisitos          | 7 toolchains                                 | Solo Docker                               |
 | Primera corrida     | Instalar cada SDK                            | Bajar ~5 GB                               |
 | Corridas siguientes | Instantáneo                                  | Rápido, con algo de overhead              |
-| Java / Kotlin       | ✗ bloqueado en esta máquina                  | ✓ funciona                                |
+| Java / Kotlin       | ✗ bloqueado en esta máquina                 | ✓ funciona                               |
 | Portabilidad        | Depende de la máquina                        | Igual en cualquier lado                   |
 
 ## Detalles de implementación

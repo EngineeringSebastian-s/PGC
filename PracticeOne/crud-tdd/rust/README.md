@@ -5,8 +5,8 @@ desarrollado con TDD.
 
 ## Qué incluye
 
-- `src/videojuego.rs`: entidad `Videojuego` con las validaciones en el constructor
-  (título y estudio no vacíos, año entre 1958 y 2100).
+- `src/videojuego.rs`: entidad `Videojuego` con las validaciones en el constructor (título y estudio no vacíos, año
+  entre 1958 y 2100).
 - `src/error.rs`: enum `ErrorCatalogo` con los dos modos de falla del dominio.
 - `src/repositorio.rs`: CRUD en memoria (crear, obtener por id, listar, actualizar, eliminar).
 - `src/main.rs`: CLI interactiva para probar el CRUD a mano.

@@ -57,7 +57,7 @@ Detalle en 👉 **[DOCKER.md](DOCKER.md)**.
 | JUnit Java   | `PracticeOne/p1-java`                   | `.\gradlew.bat test` | —                                              |
 | JUnit Kotlin | `PracticeOne/p1-kotlin`                 | `.\gradlew.bat test` | —                                              |
 | Guía web     | `PracticeOne/guia-web`                  | —                    | `npm run dev` → <http://localhost:43141>       |
-| Presentación | `PracticeOne/crud-tdd/presentacion` | — | abrir `index.html`, o `node servidor.mjs` |
+| Presentación | `PracticeOne/crud-tdd/presentacion`     | —                    | abrir `index.html`, o `node servidor.mjs`      |
 
 ## Requisitos
 

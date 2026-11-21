@@ -4,8 +4,8 @@ CRUD en memoria para gestionar una biblioteca de libros (título, autor, año, g
 
 ## Qué incluye
 
-- `src/Libro.php`: entidad `Libro`, inmutable (`readonly`), con las validaciones en el constructor
-  (título y autor no vacíos, año entre 1450 y el actual).
+- `src/Libro.php`: entidad `Libro`, inmutable (`readonly`), con las validaciones en el constructor (título y autor no
+  vacíos, año entre 1450 y el actual).
 - `src/LibroNoEncontradoException.php`: excepción propia para distinguir "no existe" de "datos inválidos".
 - `src/RepositorioLibros.php`: CRUD en memoria (crear, obtener por id, listar, actualizar, eliminar).
 - `cli.php`: menú interactivo por consola para probar el CRUD a mano.
@@ -97,8 +97,8 @@ Casos implementados en este orden (RED → GREEN → REFACTOR por cada uno):
 **La entidad es inmutable.** `Libro` usa propiedades `public readonly` promovidas en el constructor.
 Como la validación vive ahí y después nadie puede escribir los campos, *no existe forma de tener un
 `Libro` en estado inválido*. El costo es que `actualizar()` no muta: construye un `Libro` nuevo. Eso
-tiene una consecuencia que se ve en el test 15: si la actualización es inválida, la excepción salta
-**antes** de tocar el arreglo, así que el libro original queda intacto. El test lo verifica explícitamente.
+tiene una consecuencia que se ve en el test 15: si la actualización es inválida, la excepción salta **antes** de tocar
+el arreglo, así que el libro original queda intacto. El test lo verifica explícitamente.
 
 **Dos tipos de error, dos excepciones.** `InvalidArgumentException` (de PHP) para datos inválidos y
 `LibroNoEncontradoException` (propia) para un id que no existe. Tener dos tipos distintos permite que

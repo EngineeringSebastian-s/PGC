@@ -1,719 +1,1302 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Práctica 1 — Desarrollo guiado por pruebas</title>
-<style>
-  :root {
-    --fondo: #f6f7f9;
-    --panel: #ffffff;
-    --borde: #dfe3e8;
-    --texto: #1a1d21;
-    --suave: #5b6470;
-    --acento: #2f5fd0;
-    --verde: #1a7f45;
-    --rojo: #c0392b;
-    --term-fondo: #14171c;
-    --term-texto: #d6dbe3;
-    --term-verde: #6fd08c;
-    --term-rojo: #ff7b6b;
-    --term-gris: #7b8798;
-    --term-azul: #7fb3ff;
-    --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-tema="claro"]) {
-      --fondo: #16181d; --panel: #1d2027; --borde: #2e333d; --texto: #e6e9ee;
-      --suave: #9aa4b2; --acento: #7fb3ff; --verde: #6fd08c; --rojo: #ff7b6b;
-    }
-  }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Práctica 1 — Desarrollo guiado por pruebas</title>
+    <style>
+        :root {
+            --fondo: #f6f7f9;
+            --panel: #ffffff;
+            --borde: #dfe3e8;
+            --texto: #1a1d21;
+            --suave: #5b6470;
+            --acento: #2f5fd0;
+            --verde: #1a7f45;
+            --rojo: #c0392b;
+            --term-fondo: #14171c;
+            --term-texto: #d6dbe3;
+            --term-verde: #6fd08c;
+            --term-rojo: #ff7b6b;
+            --term-gris: #7b8798;
+            --term-azul: #7fb3ff;
+            --mono: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+        }
 
-  * { box-sizing: border-box; }
-  /* Los hijos de un grid no bajan de su contenido salvo que se les fije
-     min-width: 0. Sin esto, un <pre> con líneas largas ensancha la columna y
-     la página entera scrollea en horizontal en vez de scrollear el bloque. */
-  .rejilla > *, .panel-lenguaje > *, .comparacion > *, .tarjetas > * { min-width: 0; }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-tema="claro"]) {
+                --fondo: #16181d;
+                --panel: #1d2027;
+                --borde: #2e333d;
+                --texto: #e6e9ee;
+                --suave: #9aa4b2;
+                --acento: #7fb3ff;
+                --verde: #6fd08c;
+                --rojo: #ff7b6b;
+            }
+        }
 
-  body {
-    margin: 0; background: var(--fondo); color: var(--texto);
-    font: 16px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-  .envoltura { max-width: 1180px; margin: 0 auto; padding: 0 24px 64px; }
+        * {
+            box-sizing: border-box;
+        }
 
-  /* ---------------------------------------------------------- encabezado */
-  header.principal { padding: 52px 0 30px; border-bottom: 1px solid var(--borde); margin-bottom: 44px; }
-  .materia {
-    font-size: 13px; letter-spacing: .05em; text-transform: uppercase;
-    color: var(--suave); margin-bottom: 12px;
-  }
-  h1 { font-size: clamp(27px, 4vw, 38px); line-height: 1.2; margin: 0 0 14px; letter-spacing: -.015em; }
-  .bajada { font-size: 17px; color: var(--suave); max-width: 72ch; margin: 0; }
+        /* Los hijos de un grid no bajan de su contenido salvo que se les fije
+           min-width: 0. Sin esto, un <pre> con líneas largas ensancha la columna y
+           la página entera scrollea en horizontal en vez de scrollear el bloque. */
+        .rejilla > *, .panel-lenguaje > *, .comparacion > *, .tarjetas > * {
+            min-width: 0;
+        }
 
-  /* ---------------------------------------------------------- secciones */
-  section { margin-bottom: 58px; scroll-margin-top: 20px; }
-  .rotulo {
-    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-    color: var(--acento); margin: 0 0 8px;
-  }
-  h2 { font-size: 25px; margin: 0 0 14px; letter-spacing: -.015em; }
-  h3 { font-size: 18px; margin: 32px 0 10px; }
-  h4 { font-size: 15px; margin: 0 0 8px; }
-  p { margin: 0 0 14px; max-width: 78ch; }
-  ul, ol { margin: 0 0 14px; padding-left: 22px; max-width: 78ch; }
-  li { margin-bottom: 5px; }
-  .apagado { color: var(--suave); }
-  code { font-family: var(--mono); font-size: .88em; background: rgba(127,139,158,.16); padding: 1px 5px; border-radius: 4px; }
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font: 16px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
 
-  /* ---------------------------------------------------------- bloques */
-  .caja { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; padding: 18px 22px; }
-  .rejilla { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-  @media (max-width: 900px) { .rejilla { grid-template-columns: 1fr; } }
-  .tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  .tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; padding: 16px 18px; }
-  .tarjeta h4 { display: flex; align-items: center; gap: 9px; }
-  .tarjeta p { margin: 0; font-size: 14px; color: var(--suave); }
-  .num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 50%; background: var(--acento); color: #fff;
-    font-size: 12px; font-weight: 700; flex: none;
-  }
+        .envoltura {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 24px 64px;
+        }
 
-  /* ---------------------------------------------------------- consigna */
-  .consigna { counter-reset: punto; }
-  .consigna .punto {
-    background: var(--panel); border: 1px solid var(--borde); border-radius: 10px;
-    padding: 16px 20px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start;
-  }
-  .consigna .punto .n {
-    font-size: 22px; font-weight: 700; color: var(--acento); line-height: 1.2; flex: none; min-width: 22px;
-  }
-  .consigna .punto p { margin: 0; font-size: 15px; }
-  .consigna .punto .donde { font-size: 13px; color: var(--suave); margin-top: 6px; font-family: var(--mono); }
+        /* ---------------------------------------------------------- encabezado */
+        header.principal {
+            padding: 52px 0 30px;
+            border-bottom: 1px solid var(--borde);
+            margin-bottom: 44px;
+        }
 
-  /* ---------------------------------------------------------- código */
-  pre {
-    margin: 0; padding: 16px 18px; overflow-x: auto;
-    font-family: var(--mono); font-size: 13px; line-height: 1.55; tab-size: 4;
-    /* Sin ligaduras: en material didáctico, `<=` tiene que verse como dos
-       caracteres y no como "≤". */
-    font-variant-ligatures: none;
-  }
-  .codigo { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; }
-  .codigo > .ruta {
-    padding: 8px 16px; border-bottom: 1px solid var(--borde); font-family: var(--mono);
-    font-size: 12px; color: var(--suave);
-  }
-  .tok-com { color: var(--suave); font-style: italic; }
-  .tok-str { color: #b5641e; }
-  .tok-kw  { color: #8250c4; font-weight: 600; }
-  .tok-num { color: #1a7f45; }
-  .tok-fn  { color: #2f5fd0; }
-  .tok-ano { color: #b5641e; font-weight: 600; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-tema="claro"]) .tok-str { color: #e0a06a; }
-    :root:not([data-tema="claro"]) .tok-kw  { color: #c39bf5; }
-    :root:not([data-tema="claro"]) .tok-num { color: #6fd08c; }
-    :root:not([data-tema="claro"]) .tok-fn  { color: #7fb3ff; }
-    :root:not([data-tema="claro"]) .tok-ano { color: #e0a06a; }
-  }
+        .materia {
+            font-size: 13px;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--suave);
+            margin-bottom: 12px;
+        }
 
-  /* ---------------------------------------------------------- terminal */
-  .terminal { background: var(--term-fondo); border-radius: 10px; overflow: hidden; border: 1px solid #2b3038; }
-  .terminal > .barra {
-    display: flex; align-items: center; gap: 10px; padding: 9px 14px;
-    background: #1b1f26; border-bottom: 1px solid #2b3038;
-    font-family: var(--mono); font-size: 12px; color: var(--term-gris);
-  }
-  .semaforo { display: flex; gap: 6px; flex: none; }
-  .semaforo i { width: 10px; height: 10px; border-radius: 50%; display: block; }
-  .terminal pre { color: var(--term-texto); max-height: 400px; overflow-y: auto; }
-  .terminal pre .ok { color: var(--term-verde); }
-  .terminal pre .mal { color: var(--term-rojo); }
-  .terminal pre .gris { color: var(--term-gris); }
-  .insignia {
-    margin-left: auto; flex: none; font-size: 11px; letter-spacing: .04em; text-transform: uppercase;
-    padding: 2px 9px; border-radius: 20px; border: 1px solid currentColor;
-  }
-  .insignia.capturada { color: var(--term-gris); }
-  .insignia.vivo { color: var(--term-verde); }
-  .insignia.corriendo { color: var(--term-azul); }
-  .insignia.error { color: var(--term-rojo); }
+        h1 {
+            font-size: clamp(27px, 4vw, 38px);
+            line-height: 1.2;
+            margin: 0 0 14px;
+            letter-spacing: -.015em;
+        }
 
-  /* ---------------------------------------------------------- fases */
-  .fase > .cabecera { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .punto-color { width: 10px; height: 10px; border-radius: 50%; flex: none; }
-  .fase.rojo .punto-color { background: var(--rojo); }
-  .fase.verde .punto-color { background: var(--verde); }
-  .fase > .cabecera strong { font-size: 14px; letter-spacing: .05em; }
-  .fase > .cabecera span { font-size: 13px; color: var(--suave); }
-  .fase > p { font-size: 14px; color: var(--suave); }
+        .bajada {
+            font-size: 17px;
+            color: var(--suave);
+            max-width: 72ch;
+            margin: 0;
+        }
 
-  /* ---------------------------------------------------------- explorador */
-  .pestanias { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
-  .pestania {
-    background: var(--panel); border: 1px solid var(--borde); color: var(--texto);
-    border-radius: 8px; padding: 9px 15px; font: inherit; font-size: 14px; cursor: pointer;
-    display: flex; align-items: center; gap: 9px; transition: border-color .12s, background .12s;
-  }
-  .pestania:hover { border-color: var(--acento); }
-  .pestania[aria-selected="true"] { background: var(--acento); border-color: var(--acento); color: #fff; }
-  .pestania .n { font-size: 12px; opacity: .72; }
+        /* ---------------------------------------------------------- secciones */
+        section {
+            margin-bottom: 58px;
+            scroll-margin-top: 20px;
+        }
 
-  .panel-lenguaje { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-  @media (max-width: 980px) { .panel-lenguaje { grid-template-columns: 1fr; } }
-  .ancho { grid-column: 1 / -1; }
-  .bloque-titulo {
-    font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--suave);
-    font-weight: 600; margin: 0 0 9px; display: flex; justify-content: space-between; gap: 12px;
-  }
-  .bloque-titulo .cmd { font-family: var(--mono); text-transform: none; letter-spacing: 0; }
+        .rotulo {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--acento);
+            margin: 0 0 8px;
+        }
 
-  /* ficha funcional */
-  .ficha { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 0; }
-  .ficha > div { padding: 16px 20px; border-top: 1px solid var(--borde); }
-  .ficha > div + div { border-left: 1px solid var(--borde); }
-  @media (max-width: 780px) { .ficha > div + div { border-left: 0; } }
-  .ficha dt {
-    font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--suave);
-    font-weight: 700; margin-bottom: 7px;
-  }
-  .ficha ul { margin: 0; padding-left: 17px; font-size: 14px; }
-  .ficha li { margin-bottom: 4px; }
-  .campo-tipo { color: var(--suave); font-size: .88em; }
+        h2 {
+            font-size: 25px;
+            margin: 0 0 14px;
+            letter-spacing: -.015em;
+        }
 
-  .marca {
-    font-size: 12px; padding: 2px 9px; border-radius: 20px; font-weight: 600;
-    border: 1px solid var(--borde); color: var(--suave); white-space: nowrap;
-  }
-  .marca.excepciones { border-color: #b5641e; color: #b5641e; }
-  .marca.compilador { border-color: var(--verde); color: var(--verde); }
-  .marca.convencion { border-color: var(--acento); color: var(--acento); }
+        h3 {
+            font-size: 18px;
+            margin: 32px 0 10px;
+        }
 
-  .boton {
-    background: var(--acento); color: #fff; border: 0; border-radius: 8px;
-    padding: 9px 17px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
-  }
-  .boton:disabled { opacity: .5; cursor: not-allowed; }
-  .boton.secundario { background: transparent; color: var(--texto); border: 1px solid var(--borde); font-weight: 500; }
-  .boton.secundario[aria-pressed="true"] { border-color: var(--acento); color: var(--acento); }
+        h4 {
+            font-size: 15px;
+            margin: 0 0 8px;
+        }
 
-  .nota {
-    background: var(--panel); border: 1px solid var(--borde); border-left: 3px solid var(--acento);
-    border-radius: 0 8px 8px 0; padding: 13px 18px; font-size: 14px; color: var(--suave);
-  }
-  .nota b, .nota code { color: var(--texto); }
+        p {
+            margin: 0 0 14px;
+            max-width: 78ch;
+        }
 
-  .barra-corrida {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
-    background: var(--panel); border: 1px solid var(--borde); border-radius: 10px;
-    padding: 12px 18px; margin-bottom: 18px;
-  }
-  .barra-corrida .estado { font-size: 13px; color: var(--suave); margin-left: auto; }
-  .motores { display: flex; gap: 6px; }
+        ul, ol {
+            margin: 0 0 14px;
+            padding-left: 22px;
+            max-width: 78ch;
+        }
 
-  /* ---------------------------------------------------------- comparación */
-  .comparacion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  @media (max-width: 980px) { .comparacion { grid-template-columns: 1fr; } }
-  .postura { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
-  .postura > .cabecera { padding: 14px 18px; border-bottom: 1px solid var(--borde); }
-  .postura > .cabecera h4 { margin: 0 0 3px; }
-  .postura > .cabecera p { margin: 0; font-size: 13px; color: var(--suave); }
-  .postura pre { font-size: 12.5px; flex: 1; }
-  .postura .pie { padding: 13px 18px; font-size: 13px; color: var(--suave); border-top: 1px solid var(--borde); }
+        li {
+            margin-bottom: 5px;
+        }
 
-  /* ---------------------------------------------------------- tablas */
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--borde); vertical-align: top; }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--suave); font-weight: 700; }
-  tbody tr:last-child td { border-bottom: 0; }
-  tfoot td { font-weight: 700; border-top: 2px solid var(--borde); border-bottom: 0; }
-  .tabla { background: var(--panel); border: 1px solid var(--borde); border-radius: 10px; overflow: hidden; }
-  td.num-col, th.num-col { text-align: right; font-variant-numeric: tabular-nums; }
+        .apagado {
+            color: var(--suave);
+        }
 
-  footer.principal {
-    border-top: 1px solid var(--borde); padding-top: 22px; font-size: 13px; color: var(--suave);
-    display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between;
-  }
-  kbd {
-    font-family: var(--mono); font-size: 12px; border: 1px solid var(--borde);
-    border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--panel);
-  }
-</style>
+        code {
+            font-family: var(--mono);
+            font-size: .88em;
+            background: rgba(127, 139, 158, .16);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        /* ---------------------------------------------------------- bloques */
+        .caja {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 18px 22px;
+        }
+
+        .rejilla {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .rejilla {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tarjetas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .tarjeta {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+
+        .tarjeta h4 {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .tarjeta p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--suave);
+        }
+
+        .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--acento);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            flex: none;
+        }
+
+        /* ---------------------------------------------------------- consigna */
+        .consigna {
+            counter-reset: punto;
+        }
+
+        .consigna .punto {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .consigna .punto .n {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--acento);
+            line-height: 1.2;
+            flex: none;
+            min-width: 22px;
+        }
+
+        .consigna .punto p {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .consigna .punto .donde {
+            font-size: 13px;
+            color: var(--suave);
+            margin-top: 6px;
+            font-family: var(--mono);
+        }
+
+        /* ---------------------------------------------------------- código */
+        pre {
+            margin: 0;
+            padding: 16px 18px;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.55;
+            tab-size: 4;
+            /* Sin ligaduras: en material didáctico, `<=` tiene que verse como dos
+               caracteres y no como "≤". */
+            font-variant-ligatures: none;
+        }
+
+        .codigo {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .codigo > .ruta {
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--borde);
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--suave);
+        }
+
+        .tok-com {
+            color: var(--suave);
+            font-style: italic;
+        }
+
+        .tok-str {
+            color: #b5641e;
+        }
+
+        .tok-kw {
+            color: #8250c4;
+            font-weight: 600;
+        }
+
+        .tok-num {
+            color: #1a7f45;
+        }
+
+        .tok-fn {
+            color: #2f5fd0;
+        }
+
+        .tok-ano {
+            color: #b5641e;
+            font-weight: 600;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-tema="claro"]) .tok-str {
+                color: #e0a06a;
+            }
+
+            :root:not([data-tema="claro"]) .tok-kw {
+                color: #c39bf5;
+            }
+
+            :root:not([data-tema="claro"]) .tok-num {
+                color: #6fd08c;
+            }
+
+            :root:not([data-tema="claro"]) .tok-fn {
+                color: #7fb3ff;
+            }
+
+            :root:not([data-tema="claro"]) .tok-ano {
+                color: #e0a06a;
+            }
+        }
+
+        /* ---------------------------------------------------------- terminal */
+        .terminal {
+            background: var(--term-fondo);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #2b3038;
+        }
+
+        .terminal > .barra {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            background: #1b1f26;
+            border-bottom: 1px solid #2b3038;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--term-gris);
+        }
+
+        .semaforo {
+            display: flex;
+            gap: 6px;
+            flex: none;
+        }
+
+        .semaforo i {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: block;
+        }
+
+        .terminal pre {
+            color: var(--term-texto);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .terminal pre .ok {
+            color: var(--term-verde);
+        }
+
+        .terminal pre .mal {
+            color: var(--term-rojo);
+        }
+
+        .terminal pre .gris {
+            color: var(--term-gris);
+        }
+
+        .insignia {
+            margin-left: auto;
+            flex: none;
+            font-size: 11px;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            padding: 2px 9px;
+            border-radius: 20px;
+            border: 1px solid currentColor;
+        }
+
+        .insignia.capturada {
+            color: var(--term-gris);
+        }
+
+        .insignia.vivo {
+            color: var(--term-verde);
+        }
+
+        .insignia.corriendo {
+            color: var(--term-azul);
+        }
+
+        .insignia.error {
+            color: var(--term-rojo);
+        }
+
+        /* ---------------------------------------------------------- fases */
+        .fase > .cabecera {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .punto-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex: none;
+        }
+
+        .fase.rojo .punto-color {
+            background: var(--rojo);
+        }
+
+        .fase.verde .punto-color {
+            background: var(--verde);
+        }
+
+        .fase > .cabecera strong {
+            font-size: 14px;
+            letter-spacing: .05em;
+        }
+
+        .fase > .cabecera span {
+            font-size: 13px;
+            color: var(--suave);
+        }
+
+        .fase > p {
+            font-size: 14px;
+            color: var(--suave);
+        }
+
+        /* ---------------------------------------------------------- explorador */
+        .pestanias {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 18px;
+        }
+
+        .pestania {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            color: var(--texto);
+            border-radius: 8px;
+            padding: 9px 15px;
+            font: inherit;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            transition: border-color .12s, background .12s;
+        }
+
+        .pestania:hover {
+            border-color: var(--acento);
+        }
+
+        .pestania[aria-selected="true"] {
+            background: var(--acento);
+            border-color: var(--acento);
+            color: #fff;
+        }
+
+        .pestania .n {
+            font-size: 12px;
+            opacity: .72;
+        }
+
+        .panel-lenguaje {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        @media (max-width: 980px) {
+            .panel-lenguaje {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .ancho {
+            grid-column: 1 / -1;
+        }
+
+        .bloque-titulo {
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--suave);
+            font-weight: 600;
+            margin: 0 0 9px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .bloque-titulo .cmd {
+            font-family: var(--mono);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        /* ficha funcional */
+        .ficha {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+            gap: 0;
+        }
+
+        .ficha > div {
+            padding: 16px 20px;
+            border-top: 1px solid var(--borde);
+        }
+
+        .ficha > div + div {
+            border-left: 1px solid var(--borde);
+        }
+
+        @media (max-width: 780px) {
+            .ficha > div + div {
+                border-left: 0;
+            }
+        }
+
+        .ficha dt {
+            font-size: 11px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--suave);
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .ficha ul {
+            margin: 0;
+            padding-left: 17px;
+            font-size: 14px;
+        }
+
+        .ficha li {
+            margin-bottom: 4px;
+        }
+
+        .campo-tipo {
+            color: var(--suave);
+            font-size: .88em;
+        }
+
+        .marca {
+            font-size: 12px;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-weight: 600;
+            border: 1px solid var(--borde);
+            color: var(--suave);
+            white-space: nowrap;
+        }
+
+        .marca.excepciones {
+            border-color: #b5641e;
+            color: #b5641e;
+        }
+
+        .marca.compilador {
+            border-color: var(--verde);
+            color: var(--verde);
+        }
+
+        .marca.convencion {
+            border-color: var(--acento);
+            color: var(--acento);
+        }
+
+        .boton {
+            background: var(--acento);
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            padding: 9px 17px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .boton:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .boton.secundario {
+            background: transparent;
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            font-weight: 500;
+        }
+
+        .boton.secundario[aria-pressed="true"] {
+            border-color: var(--acento);
+            color: var(--acento);
+        }
+
+        .nota {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-left: 3px solid var(--acento);
+            border-radius: 0 8px 8px 0;
+            padding: 13px 18px;
+            font-size: 14px;
+            color: var(--suave);
+        }
+
+        .nota b, .nota code {
+            color: var(--texto);
+        }
+
+        .barra-corrida {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+        }
+
+        .barra-corrida .estado {
+            font-size: 13px;
+            color: var(--suave);
+            margin-left: auto;
+        }
+
+        .motores {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ---------------------------------------------------------- comparación */
+        .comparacion {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 980px) {
+            .comparacion {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .postura {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .postura > .cabecera {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .postura > .cabecera h4 {
+            margin: 0 0 3px;
+        }
+
+        .postura > .cabecera p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--suave);
+        }
+
+        .postura pre {
+            font-size: 12.5px;
+            flex: 1;
+        }
+
+        .postura .pie {
+            padding: 13px 18px;
+            font-size: 13px;
+            color: var(--suave);
+            border-top: 1px solid var(--borde);
+        }
+
+        /* ---------------------------------------------------------- tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--borde);
+            vertical-align: top;
+        }
+
+        th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--suave);
+            font-weight: 700;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tfoot td {
+            font-weight: 700;
+            border-top: 2px solid var(--borde);
+            border-bottom: 0;
+        }
+
+        .tabla {
+            background: var(--panel);
+            border: 1px solid var(--borde);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        td.num-col, th.num-col {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        footer.principal {
+            border-top: 1px solid var(--borde);
+            padding-top: 22px;
+            font-size: 13px;
+            color: var(--suave);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: space-between;
+        }
+
+        kbd {
+            font-family: var(--mono);
+            font-size: 12px;
+            border: 1px solid var(--borde);
+            border-bottom-width: 2px;
+            border-radius: 5px;
+            padding: 1px 6px;
+            background: var(--panel);
+        }
+    </style>
 </head>
 <body>
 <div class="envoltura">
 
-<header class="principal">
-  <div class="materia">Pruebas y Gestión de la Configuración · Ingeniería Informática</div>
-  <h1>Práctica 1 — Desarrollo guiado por pruebas (TDD)</h1>
-  <p class="bajada">
-    La práctica consta de tres puntos: reproducir los ejercicios de la guía de JUnit 5 en Java y en
-    Kotlin, reproducir el ejercicio de testing unitario de Softtek, y desarrollar un CRUD aplicando
-    TDD en tres lenguajes distintos. Se entregaron ocho proyectos y 137 casos de prueba.
-  </p>
-</header>
+    <header class="principal">
+        <div class="materia">Pruebas y Gestión de la Configuración · Ingeniería Informática</div>
+        <h1>Práctica 1 — Desarrollo guiado por pruebas (TDD)</h1>
+        <p class="bajada">
+            La práctica consta de tres puntos: reproducir los ejercicios de la guía de JUnit 5 en Java y en
+            Kotlin, reproducir el ejercicio de testing unitario de Softtek, y desarrollar un CRUD aplicando
+            TDD en tres lenguajes distintos. Se entregaron ocho proyectos y 137 casos de prueba.
+        </p>
+    </header>
 
-<!-- ==================================================== consigna -->
-<section id="consigna">
-  <p class="rotulo">Enunciado</p>
-  <h2>La consigna</h2>
-  <div class="consigna">
-    <div class="punto">
-      <span class="n">1</span>
-      <div>
-        <p>Realizar los ejercicios propuestos en la guía de usuario de JUnit 5, <b>en Java y en Kotlin</b>.</p>
-        <p class="donde">p1-java · p1-kotlin</p>
-      </div>
-    </div>
-    <div class="punto">
-      <span class="n">2</span>
-      <div>
-        <p>Realizar el ejercicio de testing unitario del artículo de Softtek.</p>
-        <p class="donde">p1-java/src/…/ecuacion</p>
-      </div>
-    </div>
-    <div class="punto">
-      <span class="n">3</span>
-      <div>
-        <p>Realizar un <b>CRUD en tres lenguajes diferentes</b> aplicándole TDD. No puede ser Java ni
-        Kotlin, y uno de los tres debe usar un framework de front.</p>
-        <p class="donde">crud-tdd · se entregaron seis, no tres</p>
-      </div>
-    </div>
-  </div>
-</section>
+    <!-- ==================================================== consigna -->
+    <section id="consigna">
+        <p class="rotulo">Enunciado</p>
+        <h2>La consigna</h2>
+        <div class="consigna">
+            <div class="punto">
+                <span class="n">1</span>
+                <div>
+                    <p>Realizar los ejercicios propuestos en la guía de usuario de JUnit 5, <b>en Java y en Kotlin</b>.
+                    </p>
+                    <p class="donde">p1-java · p1-kotlin</p>
+                </div>
+            </div>
+            <div class="punto">
+                <span class="n">2</span>
+                <div>
+                    <p>Realizar el ejercicio de testing unitario del artículo de Softtek.</p>
+                    <p class="donde">p1-java/src/…/ecuacion</p>
+                </div>
+            </div>
+            <div class="punto">
+                <span class="n">3</span>
+                <div>
+                    <p>Realizar un <b>CRUD en tres lenguajes diferentes</b> aplicándole TDD. No puede ser Java ni
+                        Kotlin, y uno de los tres debe usar un framework de front.</p>
+                    <p class="donde">crud-tdd · se entregaron seis, no tres</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- ==================================================== qué es TDD -->
-<section id="tdd">
-  <p class="rotulo">Marco conceptual</p>
-  <h2>Qué es TDD</h2>
-  <p>
-    TDD no consiste en escribir tests, sino en <b>escribir el test antes que el código</b> y dejar que
-    ese test condicione el diseño. El test deja de ser una tarea posterior y pasa a funcionar como la
-    especificación ejecutable del requerimiento.
-  </p>
+    <!-- ==================================================== qué es TDD -->
+    <section id="tdd">
+        <p class="rotulo">Marco conceptual</p>
+        <h2>Qué es TDD</h2>
+        <p>
+            TDD no consiste en escribir tests, sino en <b>escribir el test antes que el código</b> y dejar que
+            ese test condicione el diseño. El test deja de ser una tarea posterior y pasa a funcionar como la
+            especificación ejecutable del requerimiento.
+        </p>
 
-  <div class="tarjetas" style="margin-bottom:26px">
-    <div class="tarjeta">
-      <h4><span class="num">1</span>RED</h4>
-      <p>Se escribe un test que falla, porque el código que necesita todavía no existe. Un test que
-      nunca falló no prueba nada: no hay evidencia de que esté verificando algo.</p>
-    </div>
-    <div class="tarjeta">
-      <h4><span class="num">2</span>GREEN</h4>
-      <p>Se escribe el mínimo código que hace pasar ese test. No el código definitivo ni el más
-      elegante: el mínimo.</p>
-    </div>
-    <div class="tarjeta">
-      <h4><span class="num">3</span>REFACTOR</h4>
-      <p>Con el test en verde como red de seguridad, se mejora el código. Si el cambio rompe algo,
-      el test lo reporta de inmediato.</p>
-    </div>
-  </div>
+        <div class="tarjetas" style="margin-bottom:26px">
+            <div class="tarjeta">
+                <h4><span class="num">1</span>RED</h4>
+                <p>Se escribe un test que falla, porque el código que necesita todavía no existe. Un test que
+                    nunca falló no prueba nada: no hay evidencia de que esté verificando algo.</p>
+            </div>
+            <div class="tarjeta">
+                <h4><span class="num">2</span>GREEN</h4>
+                <p>Se escribe el mínimo código que hace pasar ese test. No el código definitivo ni el más
+                    elegante: el mínimo.</p>
+            </div>
+            <div class="tarjeta">
+                <h4><span class="num">3</span>REFACTOR</h4>
+                <p>Con el test en verde como red de seguridad, se mejora el código. Si el cambio rompe algo,
+                    el test lo reporta de inmediato.</p>
+            </div>
+        </div>
 
-  <h3>El ciclo aplicado, con corridas reales</h3>
-  <p class="apagado">
-    Las dos terminales corresponden al CRUD de Go. Muestran el mismo test en los dos estados: primero
-    fallando porque el constructor todavía no rechaza el título vacío, y después pasando una vez
-    agregada esa validación.
-  </p>
+        <h3>El ciclo aplicado, con corridas reales</h3>
+        <p class="apagado">
+            Las dos terminales corresponden al CRUD de Go. Muestran el mismo test en los dos estados: primero
+            fallando porque el constructor todavía no rechaza el título vacío, y después pasando una vez
+            agregada esa validación.
+        </p>
 
-  <div class="rejilla">
-    <div class="fase rojo">
-      <div class="cabecera"><span class="punto-color"></span><strong>RED</strong>
-        <span>el test falla: el código aún no existe</span></div>
-      <p>
-        Falla únicamente la fila <code>titulo_vacio</code> del caso de prueba; las otras cuatro pasan.
-        Esa granularidad es la que aportan los subtests: la falla señala el caso exacto.
-      </p>
-      <div id="term-rojo"></div>
-    </div>
-    <div class="fase verde">
-      <div class="cabecera"><span class="punto-color"></span><strong>GREEN</strong>
-        <span>el mínimo código que lo hace pasar</span></div>
-      <p>
-        Se incorpora la validación del título al constructor. Nada más: cualquier mejora posterior
-        corresponde al paso de refactor, ya con el test cubriendo el comportamiento.
-      </p>
-      <div id="term-verde"></div>
-    </div>
-  </div>
+        <div class="rejilla">
+            <div class="fase rojo">
+                <div class="cabecera"><span class="punto-color"></span><strong>RED</strong>
+                    <span>el test falla: el código aún no existe</span></div>
+                <p>
+                    Falla únicamente la fila <code>titulo_vacio</code> del caso de prueba; las otras cuatro pasan.
+                    Esa granularidad es la que aportan los subtests: la falla señala el caso exacto.
+                </p>
+                <div id="term-rojo"></div>
+            </div>
+            <div class="fase verde">
+                <div class="cabecera"><span class="punto-color"></span><strong>GREEN</strong>
+                    <span>el mínimo código que lo hace pasar</span></div>
+                <p>
+                    Se incorpora la validación del título al constructor. Nada más: cualquier mejora posterior
+                    corresponde al paso de refactor, ya con el test cubriendo el comportamiento.
+                </p>
+                <div id="term-verde"></div>
+            </div>
+        </div>
 
-  <div style="margin-top:18px" class="codigo">
-    <div class="ruta">crud-tdd/go/pelicula.go — las cuatro líneas que van de RED a GREEN</div>
-    <pre>  <span class="tok-kw">if</span> titulo == <span class="tok-str">""</span> {
+        <div style="margin-top:18px" class="codigo">
+            <div class="ruta">crud-tdd/go/pelicula.go — las cuatro líneas que van de RED a GREEN</div>
+            <pre>  <span class="tok-kw">if</span> titulo == <span class="tok-str">""</span> {
       <span class="tok-kw">return</span> Pelicula{}, fmt.<span class="tok-fn">Errorf</span>(<span class="tok-str">"%w: el titulo no puede ser vacio"</span>, ErrDatosInvalidos)
   }</pre>
-  </div>
-</section>
+        </div>
+    </section>
 
-<!-- ==================================================== punto 1 -->
-<section id="punto1">
-  <p class="rotulo">Punto 1</p>
-  <h2>Ejercicios de la guía de JUnit 5</h2>
-  <p>
-    Se reprodujeron los ejercicios de la sección <i>Writing Tests</i> de la guía de usuario de JUnit 5,
-    primero en Java y después en Kotlin. La clase bajo prueba es deliberadamente mínima —una
-    calculadora con <code>add</code> y <code>divide</code>—, porque el objetivo del punto no es el
-    algoritmo sino el andamiaje del framework.
-  </p>
+    <!-- ==================================================== punto 1 -->
+    <section id="punto1">
+        <p class="rotulo">Punto 1</p>
+        <h2>Ejercicios de la guía de JUnit 5</h2>
+        <p>
+            Se reprodujeron los ejercicios de la sección <i>Writing Tests</i> de la guía de usuario de JUnit 5,
+            primero en Java y después en Kotlin. La clase bajo prueba es deliberadamente mínima —una
+            calculadora con <code>add</code> y <code>divide</code>—, porque el objetivo del punto no es el
+            algoritmo sino el andamiaje del framework.
+        </p>
 
-  <h3>Qué demuestra cada elemento</h3>
-  <div class="tabla">
-    <table>
-      <thead><tr><th style="width:26%">API</th><th>Qué resuelve</th></tr></thead>
-      <tbody id="tabla-conceptos"></tbody>
-    </table>
-  </div>
+        <h3>Qué demuestra cada elemento</h3>
+        <div class="tabla">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width:26%">API</th>
+                    <th>Qué resuelve</th>
+                </tr>
+                </thead>
+                <tbody id="tabla-conceptos"></tbody>
+            </table>
+        </div>
 
-  <div class="rejilla" style="margin-top:22px">
-    <div>
-      <p class="bloque-titulo">Probar el caso de error</p>
-      <div class="codigo">
-        <div class="ruta">p1-java/src/test/java/practica/tdd/CalculatorTest.java</div>
-        <pre id="cod-java"></pre>
-      </div>
-      <div class="nota" style="margin-top:12px">
-        El test pasa <b>porque</b> el código lanza la excepción. Un caso de error también es un caso
-        de prueba, y en general es el que más defectos detecta.
-      </div>
-    </div>
-    <div>
-      <p class="bloque-titulo">Un test, varios juegos de datos</p>
-      <div class="codigo">
-        <div class="ruta">p1-java/src/test/java/practica/tdd/CalculatorTest.java</div>
-        <pre id="cod-param"></pre>
-      </div>
-      <div class="nota" style="margin-top:12px">
-        Cada fila del CSV es una ejecución independiente con su propio nombre. Si falla una, las demás
-        se reportan igual, de modo que se identifica qué dato concreto rompió.
-      </div>
-    </div>
-  </div>
+        <div class="rejilla" style="margin-top:22px">
+            <div>
+                <p class="bloque-titulo">Probar el caso de error</p>
+                <div class="codigo">
+                    <div class="ruta">p1-java/src/test/java/practica/tdd/CalculatorTest.java</div>
+                    <pre id="cod-java"></pre>
+                </div>
+                <div class="nota" style="margin-top:12px">
+                    El test pasa <b>porque</b> el código lanza la excepción. Un caso de error también es un caso
+                    de prueba, y en general es el que más defectos detecta.
+                </div>
+            </div>
+            <div>
+                <p class="bloque-titulo">Un test, varios juegos de datos</p>
+                <div class="codigo">
+                    <div class="ruta">p1-java/src/test/java/practica/tdd/CalculatorTest.java</div>
+                    <pre id="cod-param"></pre>
+                </div>
+                <div class="nota" style="margin-top:12px">
+                    Cada fila del CSV es una ejecución independiente con su propio nombre. Si falla una, las demás
+                    se reportan igual, de modo que se identifica qué dato concreto rompió.
+                </div>
+            </div>
+        </div>
 
-  <h3>La versión en Kotlin</h3>
-  <p class="apagado">
-    Mismo ejercicio, mismo framework, otro lenguaje. El interés del punto está en distinguir qué
-    cambia y qué no.
-  </p>
-  <div class="rejilla">
-    <div>
-      <div class="codigo">
-        <div class="ruta">p1-kotlin/src/test/kotlin/practica/tdd/CalculatorTest.kt</div>
-        <pre id="cod-kotlin"></pre>
-      </div>
-    </div>
-    <div id="difs-kotlin"></div>
-  </div>
+        <h3>La versión en Kotlin</h3>
+        <p class="apagado">
+            Mismo ejercicio, mismo framework, otro lenguaje. El interés del punto está en distinguir qué
+            cambia y qué no.
+        </p>
+        <div class="rejilla">
+            <div>
+                <div class="codigo">
+                    <div class="ruta">p1-kotlin/src/test/kotlin/practica/tdd/CalculatorTest.kt</div>
+                    <pre id="cod-kotlin"></pre>
+                </div>
+            </div>
+            <div id="difs-kotlin"></div>
+        </div>
 
-  <h3>Resultado de la corrida</h3>
-  <div class="rejilla">
-    <div>
-      <p class="bloque-titulo">Java <span class="cmd">gradle test</span></p>
-      <div id="term-java"></div>
-    </div>
-    <div>
-      <p class="bloque-titulo">Kotlin <span class="cmd">gradle test</span></p>
-      <div id="term-kotlin"></div>
-    </div>
-  </div>
-</section>
+        <h3>Resultado de la corrida</h3>
+        <div class="rejilla">
+            <div>
+                <p class="bloque-titulo">Java <span class="cmd">gradle test</span></p>
+                <div id="term-java"></div>
+            </div>
+            <div>
+                <p class="bloque-titulo">Kotlin <span class="cmd">gradle test</span></p>
+                <div id="term-kotlin"></div>
+            </div>
+        </div>
+    </section>
 
-<!-- ==================================================== punto 2 -->
-<section id="punto2">
-  <p class="rotulo">Punto 2</p>
-  <h2>Testing unitario: unitario frente a integración</h2>
-  <p>
-    El ejercicio resuelve una ecuación de primer grado del tipo <code>ax + b = c</code>, despejando
-    <code>x = (c - b) / a</code>. El código se dividió en dos clases con responsabilidades separadas:
-  </p>
-  <ul>
-    <li><b><code>Parseador</code></b> — interpreta el texto: separa <code>"2x - 1 = 0"</code> en
-      <code>a = 2</code>, <code>b = -1</code>, <code>c = 0</code>.</li>
-    <li><b><code>EcuacionPrimerGrado</code></b> — aplica la fórmula del despeje. Depende del
-      <code>Parseador</code>, y rechaza <code>a = 0</code> porque dejaría de ser de primer grado.</li>
-  </ul>
-  <p>
-    Esa división es la que permite ilustrar el punto central del artículo: la diferencia entre un test
-    unitario y uno de integración. Por eso el ejercicio tiene tres archivos de test y no uno.
-  </p>
+    <!-- ==================================================== punto 2 -->
+    <section id="punto2">
+        <p class="rotulo">Punto 2</p>
+        <h2>Testing unitario: unitario frente a integración</h2>
+        <p>
+            El ejercicio resuelve una ecuación de primer grado del tipo <code>ax + b = c</code>, despejando
+            <code>x = (c - b) / a</code>. El código se dividió en dos clases con responsabilidades separadas:
+        </p>
+        <ul>
+            <li><b><code>Parseador</code></b> — interpreta el texto: separa <code>"2x - 1 = 0"</code> en
+                <code>a = 2</code>, <code>b = -1</code>, <code>c = 0</code>.
+            </li>
+            <li><b><code>EcuacionPrimerGrado</code></b> — aplica la fórmula del despeje. Depende del
+                <code>Parseador</code>, y rechaza <code>a = 0</code> porque dejaría de ser de primer grado.
+            </li>
+        </ul>
+        <p>
+            Esa división es la que permite ilustrar el punto central del artículo: la diferencia entre un test
+            unitario y uno de integración. Por eso el ejercicio tiene tres archivos de test y no uno.
+        </p>
 
-  <div class="tabla">
-    <table>
-      <thead><tr><th>Archivo</th><th>Tipo</th><th>Qué prueba</th><th class="num-col">Tests</th><th>Dependencias reales</th></tr></thead>
-      <tbody id="tabla-softtek"></tbody>
-    </table>
-  </div>
+        <div class="tabla">
+            <table>
+                <thead>
+                <tr>
+                    <th>Archivo</th>
+                    <th>Tipo</th>
+                    <th>Qué prueba</th>
+                    <th class="num-col">Tests</th>
+                    <th>Dependencias reales</th>
+                </tr>
+                </thead>
+                <tbody id="tabla-softtek"></tbody>
+            </table>
+        </div>
 
-  <h3>La fórmula bajo prueba</h3>
-  <div class="codigo">
-    <div class="ruta">p1-java/src/main/java/practica/tdd/ecuacion/EcuacionPrimerGrado.java</div>
-    <pre id="cod-formula"></pre>
-  </div>
+        <h3>La fórmula bajo prueba</h3>
+        <div class="codigo">
+            <div class="ruta">p1-java/src/main/java/practica/tdd/ecuacion/EcuacionPrimerGrado.java</div>
+            <pre id="cod-formula"></pre>
+        </div>
 
-  <h3>Por qué se usa un mock</h3>
-  <p>
-    <code>EcuacionPrimerGrado</code> depende de <code>Parseador</code>. Si la fórmula se prueba con el
-    parseador real y el test falla, no queda claro cuál de las dos clases tiene el defecto. Mockito
-    resuelve eso reemplazando la dependencia por un doble de prueba programado.
-  </p>
+        <h3>Por qué se usa un mock</h3>
+        <p>
+            <code>EcuacionPrimerGrado</code> depende de <code>Parseador</code>. Si la fórmula se prueba con el
+            parseador real y el test falla, no queda claro cuál de las dos clases tiene el defecto. Mockito
+            resuelve eso reemplazando la dependencia por un doble de prueba programado.
+        </p>
 
-  <div class="rejilla">
-    <div>
-      <p class="bloque-titulo">Test unitario aislado — con mock</p>
-      <div class="codigo">
-        <div class="ruta">EcuacionPrimerGradoMockitoTest.java</div>
-        <pre id="cod-mock"></pre>
-      </div>
-      <div class="nota" style="margin-top:12px">
-        Este test <b>no parsea nada</b>. Le indica al doble qué devolver y verifica una sola cosa: que
-        con <code>a=2, b=-1, c=0</code> la fórmula dé <code>0.5</code>. Si el parseador real se rompe,
-        este test sigue pasando y el que falla es <code>ParseadorTest</code>, que es donde está el
-        defecto. Eso es aislar la unidad.
-      </div>
-    </div>
-    <div>
-      <p class="bloque-titulo">Test de integración — sin mock</p>
-      <div class="codigo">
-        <div class="ruta">EcuacionPrimerGradoIntegrationTest.java</div>
-        <pre id="cod-integracion"></pre>
-      </div>
-      <div class="nota" style="margin-top:12px">
-        El mock tiene un punto ciego: asume que el parseador devuelve lo que el test declaró. El test
-        de integración ejecuta la cadena completa con el parseador real, y es el único que verifica
-        que las dos clases <b>encajan</b>. Ambos tipos son necesarios.
-      </div>
-    </div>
-  </div>
+        <div class="rejilla">
+            <div>
+                <p class="bloque-titulo">Test unitario aislado — con mock</p>
+                <div class="codigo">
+                    <div class="ruta">EcuacionPrimerGradoMockitoTest.java</div>
+                    <pre id="cod-mock"></pre>
+                </div>
+                <div class="nota" style="margin-top:12px">
+                    Este test <b>no parsea nada</b>. Le indica al doble qué devolver y verifica una sola cosa: que
+                    con <code>a=2, b=-1, c=0</code> la fórmula dé <code>0.5</code>. Si el parseador real se rompe,
+                    este test sigue pasando y el que falla es <code>ParseadorTest</code>, que es donde está el
+                    defecto. Eso es aislar la unidad.
+                </div>
+            </div>
+            <div>
+                <p class="bloque-titulo">Test de integración — sin mock</p>
+                <div class="codigo">
+                    <div class="ruta">EcuacionPrimerGradoIntegrationTest.java</div>
+                    <pre id="cod-integracion"></pre>
+                </div>
+                <div class="nota" style="margin-top:12px">
+                    El mock tiene un punto ciego: asume que el parseador devuelve lo que el test declaró. El test
+                    de integración ejecuta la cadena completa con el parseador real, y es el único que verifica
+                    que las dos clases <b>encajan</b>. Ambos tipos son necesarios.
+                </div>
+            </div>
+        </div>
 
-  <div class="tabla" style="margin-top:22px">
-    <table>
-      <thead><tr><th></th><th>Test unitario (con mock)</th><th>Test de integración</th></tr></thead>
-      <tbody>
-        <tr><td><b>Qué prueba</b></td><td>Una clase aislada</td><td>Varias clases en conjunto</td></tr>
-        <tr><td><b>Si falla</b></td><td>Señala exactamente el responsable</td><td>Indica que algo no encaja, sin localizarlo</td></tr>
-        <tr><td><b>Velocidad</b></td><td>Inmediato</td><td>Más lento</td></tr>
-        <tr><td><b>Punto ciego</b></td><td>Asume el contrato de la dependencia</td><td>Ninguno, pero no localiza el defecto</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+        <div class="tabla" style="margin-top:22px">
+            <table>
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Test unitario (con mock)</th>
+                    <th>Test de integración</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><b>Qué prueba</b></td>
+                    <td>Una clase aislada</td>
+                    <td>Varias clases en conjunto</td>
+                </tr>
+                <tr>
+                    <td><b>Si falla</b></td>
+                    <td>Señala exactamente el responsable</td>
+                    <td>Indica que algo no encaja, sin localizarlo</td>
+                </tr>
+                <tr>
+                    <td><b>Velocidad</b></td>
+                    <td>Inmediato</td>
+                    <td>Más lento</td>
+                </tr>
+                <tr>
+                    <td><b>Punto ciego</b></td>
+                    <td>Asume el contrato de la dependencia</td>
+                    <td>Ninguno, pero no localiza el defecto</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-<!-- ==================================================== punto 3 -->
-<section id="punto3">
-  <p class="rotulo">Punto 3</p>
-  <h2>CRUD con TDD en seis lenguajes</h2>
-  <p>
-    La consigna pedía tres lenguajes. Se implementaron seis: <b>C#</b>, <b>Python</b> y
-    <b>TypeScript/React</b> son los tres que cubren el enunciado —React cumple el requisito de
-    framework de front—, y <b>PHP</b>, <b>Rust</b> y <b>Go</b> se agregaron como extensión para poder
-    comparar.
-  </p>
+    <!-- ==================================================== punto 3 -->
+    <section id="punto3">
+        <p class="rotulo">Punto 3</p>
+        <h2>CRUD con TDD en seis lenguajes</h2>
+        <p>
+            La consigna pedía tres lenguajes. Se implementaron seis: <b>C#</b>, <b>Python</b> y
+            <b>TypeScript/React</b> son los tres que cubren el enunciado —React cumple el requisito de
+            framework de front—, y <b>PHP</b>, <b>Rust</b> y <b>Go</b> se agregaron como extensión para poder
+            comparar.
+        </p>
 
-  <h3>El modelo funcional común</h3>
-  <p class="apagado">
-    Los seis proyectos resuelven el mismo problema con distinto dominio. Fijar el problema hace que lo
-    único que varíe entre proyectos sea el lenguaje.
-  </p>
-  <div class="tarjetas" style="margin-bottom:20px">
-    <div class="tarjeta"><h4><span class="num">1</span>Entidad validada</h4>
-      <p>Campos obligatorios y un rango de año admitido. Las reglas viven en un solo lugar.</p></div>
-    <div class="tarjeta"><h4><span class="num">2</span>Repositorio en memoria</h4>
-      <p>Alta, consulta por id, listado, modificación parcial y baja.</p></div>
-    <div class="tarjeta"><h4><span class="num">3</span>Identificadores internos</h4>
-      <p>Autoincrementales, asignados por el repositorio y no por quien lo invoca.</p></div>
-    <div class="tarjeta"><h4><span class="num">4</span>Dos clases de error</h4>
-      <p>Datos inválidos y entidad inexistente, siempre distinguibles desde el test.</p></div>
-  </div>
-  <p class="apagado">
-    Los nombres de los casos de prueba siguen el mismo patrón en los seis
-    (<code>deberia_&lt;comportamiento&gt;_&lt;condición&gt;</code>), de modo que se pueden comparar
-    caso por caso entre lenguajes.
-  </p>
+        <h3>El modelo funcional común</h3>
+        <p class="apagado">
+            Los seis proyectos resuelven el mismo problema con distinto dominio. Fijar el problema hace que lo
+            único que varíe entre proyectos sea el lenguaje.
+        </p>
+        <div class="tarjetas" style="margin-bottom:20px">
+            <div class="tarjeta"><h4><span class="num">1</span>Entidad validada</h4>
+                <p>Campos obligatorios y un rango de año admitido. Las reglas viven en un solo lugar.</p></div>
+            <div class="tarjeta"><h4><span class="num">2</span>Repositorio en memoria</h4>
+                <p>Alta, consulta por id, listado, modificación parcial y baja.</p></div>
+            <div class="tarjeta"><h4><span class="num">3</span>Identificadores internos</h4>
+                <p>Autoincrementales, asignados por el repositorio y no por quien lo invoca.</p></div>
+            <div class="tarjeta"><h4><span class="num">4</span>Dos clases de error</h4>
+                <p>Datos inválidos y entidad inexistente, siempre distinguibles desde el test.</p></div>
+        </div>
+        <p class="apagado">
+            Los nombres de los casos de prueba siguen el mismo patrón en los seis
+            (<code>deberia_&lt;comportamiento&gt;_&lt;condición&gt;</code>), de modo que se pueden comparar
+            caso por caso entre lenguajes.
+        </p>
 
-  <h3>Cada implementación en detalle</h3>
+        <h3>Cada implementación en detalle</h3>
 
-  <div class="barra-corrida">
-    <button class="boton" id="btn-correr">▶ Correr esta suite</button>
-    <div class="motores" role="group" aria-label="Motor de ejecución">
-      <button class="boton secundario" data-motor="local" aria-pressed="true">Local</button>
-      <button class="boton secundario" data-motor="docker" aria-pressed="false">Docker</button>
-    </div>
-    <div class="estado" id="estado-servidor">Comprobando el servidor…</div>
-  </div>
+        <div class="barra-corrida">
+            <button class="boton" id="btn-correr">▶ Correr esta suite</button>
+            <div class="motores" role="group" aria-label="Motor de ejecución">
+                <button class="boton secundario" data-motor="local" aria-pressed="true">Local</button>
+                <button class="boton secundario" data-motor="docker" aria-pressed="false">Docker</button>
+            </div>
+            <div class="estado" id="estado-servidor">Comprobando el servidor…</div>
+        </div>
 
-  <div class="pestanias" id="pestanias" role="tablist"></div>
-  <div class="panel-lenguaje" id="panel"></div>
+        <div class="pestanias" id="pestanias" role="tablist"></div>
+        <div class="panel-lenguaje" id="panel"></div>
 
-  <h3>Las tres formas de probar un error</h3>
-  <p>
-    El mismo caso de prueba en los seis proyectos —consultar un identificador que no existe— se
-    escribe de tres maneras distintas según cómo el lenguaje represente el fallo.
-  </p>
-  <div class="comparacion">
-    <div class="postura">
-      <div class="cabecera"><h4>1 · Excepciones</h4><p>C#, Python, PHP, React</p></div>
-      <pre><span class="tok-kw">with</span> pytest.<span class="tok-fn">raises</span>(ViniloNoEncontradoError):
+        <h3>Las tres formas de probar un error</h3>
+        <p>
+            El mismo caso de prueba en los seis proyectos —consultar un identificador que no existe— se
+            escribe de tres maneras distintas según cómo el lenguaje represente el fallo.
+        </p>
+        <div class="comparacion">
+            <div class="postura">
+                <div class="cabecera"><h4>1 · Excepciones</h4>
+                    <p>C#, Python, PHP, React</p></div>
+                <pre><span class="tok-kw">with</span> pytest.<span class="tok-fn">raises</span>(ViniloNoEncontradoError):
     repositorio.<span class="tok-fn">obtener_por_id</span>(<span class="tok-num">999</span>)</pre>
-      <div class="pie">El fallo viaja por un canal separado del valor de retorno, así que el test
-        necesita un mecanismo específico para capturarlo.</div>
-    </div>
-    <div class="postura">
-      <div class="cabecera"><h4>2 · Valor de retorno, verificado por el compilador</h4><p>Rust</p></div>
-      <pre><span class="tok-kw">let</span> resultado = repositorio.<span class="tok-fn">obtener_por_id</span>(<span class="tok-num">999</span>);
-<span class="tok-fn">assert_eq!</span>(resultado, <span class="tok-kw">Err</span>(ErrorCatalogo::VideojuegoNoEncontrado(<span class="tok-num">999</span>)));</pre>
-      <div class="pie">El error es el propio resultado, y se compara con la misma aserción de igualdad
-        que el caso correcto. El compilador no permite ignorarlo.</div>
-    </div>
-    <div class="postura">
-      <div class="cabecera"><h4>3 · Valor de retorno, verificado por convención</h4><p>Go</p></div>
-      <pre>_, err := repositorio.<span class="tok-fn">ObtenerPorID</span>(<span class="tok-num">999</span>)
+                <div class="pie">El fallo viaja por un canal separado del valor de retorno, así que el test
+                    necesita un mecanismo específico para capturarlo.
+                </div>
+            </div>
+            <div class="postura">
+                <div class="cabecera"><h4>2 · Valor de retorno, verificado por el compilador</h4>
+                    <p>Rust</p></div>
+                <pre><span class="tok-kw">let</span> resultado = repositorio.<span class="tok-fn">obtener_por_id</span>(<span
+                        class="tok-num">999</span>);
+<span class="tok-fn">assert_eq!</span>(resultado, <span class="tok-kw">Err</span>(ErrorCatalogo::VideojuegoNoEncontrado(<span
+                            class="tok-num">999</span>)));</pre>
+                <div class="pie">El error es el propio resultado, y se compara con la misma aserción de igualdad
+                    que el caso correcto. El compilador no permite ignorarlo.
+                </div>
+            </div>
+            <div class="postura">
+                <div class="cabecera"><h4>3 · Valor de retorno, verificado por convención</h4>
+                    <p>Go</p></div>
+                <pre>_, err := repositorio.<span class="tok-fn">ObtenerPorID</span>(<span class="tok-num">999</span>)
 
 <span class="tok-kw">if</span> !errors.<span class="tok-fn">Is</span>(err, catalogo.ErrNoEncontrada) {
     t.<span class="tok-fn">Errorf</span>(<span class="tok-str">"se esperaba ErrNoEncontrada, se obtuvo: %v"</span>, err)
 }</pre>
-      <div class="pie">También es un valor, pero <code>repositorio.Eliminar(id)</code> sin asignación
-        compila igual. Acá el test es la única verificación de que el error se propaga.</div>
-    </div>
-  </div>
-</section>
+                <div class="pie">También es un valor, pero <code>repositorio.Eliminar(id)</code> sin asignación
+                    compila igual. Acá el test es la única verificación de que el error se propaga.
+                </div>
+            </div>
+        </div>
+    </section>
 
-<!-- ==================================================== resultados -->
-<section id="resultados">
-  <p class="rotulo">Resultados</p>
-  <h2>Casos de prueba por proyecto</h2>
-  <p class="apagado">
-    Las cifras corresponden a las corridas reproducidas en este documento. Las ocho suítes pasan sin
-    fallos.
-  </p>
-  <div class="tabla">
-    <table>
-      <thead><tr><th>Proyecto</th><th>Punto</th><th>Framework</th><th class="num-col">Tests</th></tr></thead>
-      <tbody id="tabla-resultados"></tbody>
-      <tfoot><tr><td colspan="3">Total</td><td class="num-col" id="total-tests"></td></tr></tfoot>
-    </table>
-  </div>
-</section>
+    <!-- ==================================================== resultados -->
+    <section id="resultados">
+        <p class="rotulo">Resultados</p>
+        <h2>Casos de prueba por proyecto</h2>
+        <p class="apagado">
+            Las cifras corresponden a las corridas reproducidas en este documento. Las ocho suítes pasan sin
+            fallos.
+        </p>
+        <div class="tabla">
+            <table>
+                <thead>
+                <tr>
+                    <th>Proyecto</th>
+                    <th>Punto</th>
+                    <th>Framework</th>
+                    <th class="num-col">Tests</th>
+                </tr>
+                </thead>
+                <tbody id="tabla-resultados"></tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3">Total</td>
+                    <td class="num-col" id="total-tests"></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
 
-<!-- ==================================================== conclusiones -->
-<section id="conclusiones">
-  <p class="rotulo">Cierre</p>
-  <h2>Conclusiones</h2>
-  <ol>
-    <li>
-      <b>Escribir el test primero condiciona el diseño, no solo la confianza.</b> Los seis
-      repositorios terminaron asignando los identificadores internamente y no dejándolos en manos de
-      quien los invoca, porque el primer test escrito fue el del identificador autoincremental. La
-      decisión de diseño la forzó el test.
-    </li>
-    <li>
-      <b>Usar un mock no es evitar la prueba: es decidir qué se está probando.</b> El test con doble
-      y el de integración responden preguntas distintas y ninguno reemplaza al otro. El primero
-      localiza el defecto; el segundo verifica que las piezas encajen.
-    </li>
-    <li>
-      <b>El ciclo es idéntico en los seis lenguajes; lo que cambia es qué puede expresar el test.</b>
-      El caso más claro es el tratamiento del error: con excepciones, con un <code>Result</code> que
-      el compilador obliga a atender, o con un valor de error que nadie obliga a mirar. Cuanto menos
-      cubre el lenguaje, más responsabilidad recae sobre el test.
-    </li>
-  </ol>
-</section>
+    <!-- ==================================================== conclusiones -->
+    <section id="conclusiones">
+        <p class="rotulo">Cierre</p>
+        <h2>Conclusiones</h2>
+        <ol>
+            <li>
+                <b>Escribir el test primero condiciona el diseño, no solo la confianza.</b> Los seis
+                repositorios terminaron asignando los identificadores internamente y no dejándolos en manos de
+                quien los invoca, porque el primer test escrito fue el del identificador autoincremental. La
+                decisión de diseño la forzó el test.
+            </li>
+            <li>
+                <b>Usar un mock no es evitar la prueba: es decidir qué se está probando.</b> El test con doble
+                y el de integración responden preguntas distintas y ninguno reemplaza al otro. El primero
+                localiza el defecto; el segundo verifica que las piezas encajen.
+            </li>
+            <li>
+                <b>El ciclo es idéntico en los seis lenguajes; lo que cambia es qué puede expresar el test.</b>
+                El caso más claro es el tratamiento del error: con excepciones, con un <code>Result</code> que
+                el compilador obliga a atender, o con un valor de error que nadie obliga a mirar. Cuanto menos
+                cubre el lenguaje, más responsabilidad recae sobre el test.
+            </li>
+        </ol>
+    </section>
 
-<footer class="principal">
-  <span>Práctica 1 · Pruebas y Gestión de la Configuración · Ingeniería Informática</span>
-  <span><kbd>←</kbd> <kbd>→</kbd> cambian de lenguaje · <kbd>R</kbd> corre la suite</span>
-</footer>
+    <footer class="principal">
+        <span>Práctica 1 · Pruebas y Gestión de la Configuración · Ingeniería Informática</span>
+        <span><kbd>←</kbd> <kbd>→</kbd> cambian de lenguaje · <kbd>R</kbd> corre la suite</span>
+    </footer>
 
 </div>
 
 <script>
-const DATOS = /*__DATOS__*/;
+    const DATOS = /*__DATOS__*/;
 
-/* ------------------------------------------------------------ coloreado */
-/* Resaltador mínimo, sin dependencias, para que el archivo sea autónomo.
-   Va en UNA sola pasada con un regex combinado: si se hiciera pasada por
-   pasada, la de números terminaría comiéndose los índices de los tokens ya
-   marcados. Por eso ninguno de estos patrones debe tener grupos de captura:
-   el índice del grupo que matcheó es el que elige la clase CSS. */
-const PALABRAS = {
-  go: /\b(?:func|return|if|else|for|range|package|import|type|struct|var|const|nil|error|string|int|bool|true|false|switch|case|default|defer|make|len|append|copy)\b/,
-  rust: /\b(?:fn|let|mut|pub|return|if|else|match|use|struct|enum|impl|Self|self|Ok|Err|Some|None|true|false|const|crate|mod|for|in|where)\b/,
-  python: /\b(?:def|return|if|elif|else|raise|import|from|class|self|not|and|or|in|is|None|True|False|for|while|with|as|try|except|pass|lambda)\b/,
-  csharp: /\b(?:public|private|static|void|return|if|else|new|class|var|string|int|bool|true|false|null|throw|using|namespace|readonly|foreach|in|this)\b/,
-  php: /\b(?:public|private|function|return|if|else|new|class|final|readonly|throw|use|namespace|declare|strict_types|const|true|false|null|foreach|as|array)\b/,
-  typescript: /\b(?:export|function|return|if|else|const|let|var|type|interface|import|from|new|throw|true|false|null|undefined|describe|it|expect)\b/,
-  java: /\b(?:public|private|protected|static|final|void|return|if|else|new|class|int|double|String|boolean|true|false|null|throw|throws|import|package|this)\b/,
-  kotlin: /\b(?:fun|val|var|return|if|else|class|object|private|lateinit|true|false|null|is|in|when|import|package|this)\b/,
-};
-const COMENTARIOS = {
-  go: /\/\/.*$/, rust: /\/\/.*$/, csharp: /\/\/.*$/, typescript: /\/\/.*$/,
-  java: /\/\/.*$|\/\*[\s\S]*?\*\//, kotlin: /\/\/.*$/,
-  python: /#.*$/, php: /(?:\/\/|#(?!\[)).*$|\/\*[\s\S]*?\*\//,
-};
-const ANOTACIONES = {java: /@\w+/, kotlin: /@\w+/, csharp: /\[\w+(?:\([^)]*\))?\]/, php: /#\[\w+\]/};
-const CADENAS = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/;
-const LLAMADAS = /\b[A-Za-z_]\w*!?(?=\s*\()/;
-const NUMEROS = /\b\d[\d_]*(?:\.\d+)?\b/;
+    /* ------------------------------------------------------------ coloreado */
+    /* Resaltador mínimo, sin dependencias, para que el archivo sea autónomo.
+       Va en UNA sola pasada con un regex combinado: si se hiciera pasada por
+       pasada, la de números terminaría comiéndose los índices de los tokens ya
+       marcados. Por eso ninguno de estos patrones debe tener grupos de captura:
+       el índice del grupo que matcheó es el que elige la clase CSS. */
+    const PALABRAS = {
+        go: /\b(?:func|return|if|else|for|range|package|import|type|struct|var|const|nil|error|string|int|bool|true|false|switch|case|default|defer|make|len|append|copy)\b/,
+        rust: /\b(?:fn|let|mut|pub|return|if|else|match|use|struct|enum|impl|Self|self|Ok|Err|Some|None|true|false|const|crate|mod|for|in|where)\b/,
+        python: /\b(?:def|return|if|elif|else|raise|import|from|class|self|not|and|or|in|is|None|True|False|for|while|with|as|try|except|pass|lambda)\b/,
+        csharp: /\b(?:public|private|static|void|return|if|else|new|class|var|string|int|bool|true|false|null|throw|using|namespace|readonly|foreach|in|this)\b/,
+        php: /\b(?:public|private|function|return|if|else|new|class|final|readonly|throw|use|namespace|declare|strict_types|const|true|false|null|foreach|as|array)\b/,
+        typescript: /\b(?:export|function|return|if|else|const|let|var|type|interface|import|from|new|throw|true|false|null|undefined|describe|it|expect)\b/,
+        java: /\b(?:public|private|protected|static|final|void|return|if|else|new|class|int|double|String|boolean|true|false|null|throw|throws|import|package|this)\b/,
+        kotlin: /\b(?:fun|val|var|return|if|else|class|object|private|lateinit|true|false|null|is|in|when|import|package|this)\b/,
+    };
+    const COMENTARIOS = {
+        go: /\/\/.*$/, rust: /\/\/.*$/, csharp: /\/\/.*$/, typescript: /\/\/.*$/,
+        java: /\/\/.*$|\/\*[\s\S]*?\*\//, kotlin: /\/\/.*$/,
+        python: /#.*$/, php: /(?:\/\/|#(?!\[)).*$|\/\*[\s\S]*?\*\//,
+    };
+    const ANOTACIONES = {java: /@\w+/, kotlin: /@\w+/, csharp: /\[\w+(?:\([^)]*\))?\]/, php: /#\[\w+\]/};
+    const CADENAS = /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/;
+    const LLAMADAS = /\b[A-Za-z_]\w*!?(?=\s*\()/;
+    const NUMEROS = /\b\d[\d_]*(?:\.\d+)?\b/;
 
-const escapar = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const escapar = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const cacheRegex = new Map();
+    const cacheRegex = new Map();
 
-function regexDe(lenguaje) {
-  if (cacheRegex.has(lenguaje)) return cacheRegex.get(lenguaje);
-  // El orden importa: ante dos alternativas que arrancan en la misma
-  // posición gana la primera, así `if (` se pinta como palabra clave y no
-  // como llamada a función.
-  const partes = [
-    ["tok-com", COMENTARIOS[lenguaje]],
-    ["tok-str", CADENAS],
-    ["tok-ano", ANOTACIONES[lenguaje]],
-    ["tok-kw", PALABRAS[lenguaje]],
-    ["tok-fn", LLAMADAS],
-    ["tok-num", NUMEROS],
-  ].filter(([, rx]) => rx);
+    function regexDe(lenguaje) {
+        if (cacheRegex.has(lenguaje)) return cacheRegex.get(lenguaje);
+        // El orden importa: ante dos alternativas que arrancan en la misma
+        // posición gana la primera, así `if (` se pinta como palabra clave y no
+        // como llamada a función.
+        const partes = [
+            ["tok-com", COMENTARIOS[lenguaje]],
+            ["tok-str", CADENAS],
+            ["tok-ano", ANOTACIONES[lenguaje]],
+            ["tok-kw", PALABRAS[lenguaje]],
+            ["tok-fn", LLAMADAS],
+            ["tok-num", NUMEROS],
+        ].filter(([, rx]) => rx);
 
-  const entrada = {
-    clases: partes.map(([clase]) => clase),
-    regex: new RegExp(partes.map(([, rx]) => `(${rx.source})`).join("|"), "gm"),
-  };
-  cacheRegex.set(lenguaje, entrada);
-  return entrada;
-}
+        const entrada = {
+            clases: partes.map(([clase]) => clase),
+            regex: new RegExp(partes.map(([, rx]) => `(${rx.source})`).join("|"), "gm"),
+        };
+        cacheRegex.set(lenguaje, entrada);
+        return entrada;
+    }
 
-function colorear(codigo, lenguaje) {
-  const {clases, regex} = regexDe(lenguaje);
-  regex.lastIndex = 0;
+    function colorear(codigo, lenguaje) {
+        const {clases, regex} = regexDe(lenguaje);
+        regex.lastIndex = 0;
 
-  let salida = "", fin = 0, m;
-  while ((m = regex.exec(codigo)) !== null) {
-    if (m[0] === "") { regex.lastIndex++; continue; }
-    const cual = m.slice(1).findIndex((v) => v !== undefined);
-    salida += escapar(codigo.slice(fin, m.index));
-    salida += `<span class="${clases[cual]}">${escapar(m[0])}</span>`;
-    fin = m.index + m[0].length;
-  }
-  return salida + escapar(codigo.slice(fin));
-}
+        let salida = "", fin = 0, m;
+        while ((m = regex.exec(codigo)) !== null) {
+            if (m[0] === "") {
+                regex.lastIndex++;
+                continue;
+            }
+            const cual = m.slice(1).findIndex((v) => v !== undefined);
+            salida += escapar(codigo.slice(fin, m.index));
+            salida += `<span class="${clases[cual]}">${escapar(m[0])}</span>`;
+            fin = m.index + m[0].length;
+        }
+        return salida + escapar(codigo.slice(fin));
+    }
 
-/* Colorea la salida de una terminal según lo que significa cada línea. */
-function colorearSalida(texto) {
-  return texto.split("\n").map((linea) => {
-    const l = escapar(linea);
-    if (/\b(FAIL|FAILED|failed|error|Error:|✗|✘)\b/.test(linea) && !/0 failed|Failed:\s+0|; 0 failed/.test(linea))
-      return `<span class="mal">${l}</span>`;
-    if (/\b(ok|OK|PASS|PASSED|passed|Passed|SUCCESSFUL|✔|✓)\b/.test(linea))
-      return `<span class="ok">${l}</span>`;
-    if (/^\s*(===|---|>|\s*$)/.test(linea) || /^\s*\?\s/.test(linea))
-      return `<span class="gris">${l}</span>`;
-    return l;
-  }).join("\n");
-}
+    /* Colorea la salida de una terminal según lo que significa cada línea. */
+    function colorearSalida(texto) {
+        return texto.split("\n").map((linea) => {
+            const l = escapar(linea);
+            if (/\b(FAIL|FAILED|failed|error|Error:|✗|✘)\b/.test(linea) && !/0 failed|Failed:\s+0|; 0 failed/.test(linea))
+                return `<span class="mal">${l}</span>`;
+            if (/\b(ok|OK|PASS|PASSED|passed|Passed|SUCCESSFUL|✔|✓)\b/.test(linea))
+                return `<span class="ok">${l}</span>`;
+            if (/^\s*(===|---|>|\s*$)/.test(linea) || /^\s*\?\s/.test(linea))
+                return `<span class="gris">${l}</span>`;
+            return l;
+        }).join("\n");
+    }
 
-function terminal({titulo, texto, insignia = "capturada", etiqueta = "salida capturada"}) {
-  return `<div class="terminal">
+    function terminal({titulo, texto, insignia = "capturada", etiqueta = "salida capturada"}) {
+        return `<div class="terminal">
     <div class="barra">
       <span class="semaforo"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></span>
       <span>${escapar(titulo)}</span>
@@ -721,76 +1304,76 @@ function terminal({titulo, texto, insignia = "capturada", etiqueta = "salida cap
     </div>
     <pre>${colorearSalida(texto)}</pre>
   </div>`;
-}
+    }
 
-const ponerCodigo = (id, codigo, lenguaje) =>
-  (document.getElementById(id).innerHTML = colorear(codigo, lenguaje));
+    const ponerCodigo = (id, codigo, lenguaje) =>
+        (document.getElementById(id).innerHTML = colorear(codigo, lenguaje));
 
-/* ------------------------------------------------------------ ciclo TDD */
-document.getElementById("term-rojo").innerHTML =
-  terminal({titulo: "go test -run TestDeberiaRechazarDatosInvalidos", texto: DATOS.ciclo.rojo_salida});
-document.getElementById("term-verde").innerHTML =
-  terminal({titulo: "go test ./...", texto: DATOS.ciclo.verde_salida});
+    /* ------------------------------------------------------------ ciclo TDD */
+    document.getElementById("term-rojo").innerHTML =
+        terminal({titulo: "go test -run TestDeberiaRechazarDatosInvalidos", texto: DATOS.ciclo.rojo_salida});
+    document.getElementById("term-verde").innerHTML =
+        terminal({titulo: "go test ./...", texto: DATOS.ciclo.verde_salida});
 
-/* ------------------------------------------------------------ punto 1 */
-const p1 = DATOS.punto_uno;
-document.getElementById("tabla-conceptos").innerHTML = p1.conceptos
-  .map((c) => `<tr><td><code>${escapar(c.api)}</code></td><td>${c.que}</td></tr>`).join("");
+    /* ------------------------------------------------------------ punto 1 */
+    const p1 = DATOS.punto_uno;
+    document.getElementById("tabla-conceptos").innerHTML = p1.conceptos
+        .map((c) => `<tr><td><code>${escapar(c.api)}</code></td><td>${c.que}</td></tr>`).join("");
 
-ponerCodigo("cod-java", p1.codigo_java, "java");
-ponerCodigo("cod-param", p1.codigo_parametrizado, "java");
-ponerCodigo("cod-kotlin", p1.codigo_kotlin, "kotlin");
+    ponerCodigo("cod-java", p1.codigo_java, "java");
+    ponerCodigo("cod-param", p1.codigo_parametrizado, "java");
+    ponerCodigo("cod-kotlin", p1.codigo_kotlin, "kotlin");
 
-document.getElementById("difs-kotlin").innerHTML = p1.diferencias_kotlin
-  .map((d) => `<div class="caja" style="margin-bottom:12px">
+    document.getElementById("difs-kotlin").innerHTML = p1.diferencias_kotlin
+        .map((d) => `<div class="caja" style="margin-bottom:12px">
     <h4>${escapar(d.titulo)}</h4>
     <p style="margin:0;font-size:14px;color:var(--suave)">${d.texto}</p></div>`).join("");
 
-document.getElementById("term-java").innerHTML =
-  terminal({titulo: "p1-java · gradle test", texto: p1.salida_java});
-document.getElementById("term-kotlin").innerHTML =
-  terminal({titulo: "p1-kotlin · gradle test", texto: p1.salida_kotlin});
+    document.getElementById("term-java").innerHTML =
+        terminal({titulo: "p1-java · gradle test", texto: p1.salida_java});
+    document.getElementById("term-kotlin").innerHTML =
+        terminal({titulo: "p1-kotlin · gradle test", texto: p1.salida_kotlin});
 
-/* ------------------------------------------------------------ punto 2 */
-const p2 = DATOS.punto_dos;
-document.getElementById("tabla-softtek").innerHTML = p2.archivos
-  .map((a) => `<tr><td><code>${escapar(a.archivo)}</code></td><td>${escapar(a.tipo)}</td>
+    /* ------------------------------------------------------------ punto 2 */
+    const p2 = DATOS.punto_dos;
+    document.getElementById("tabla-softtek").innerHTML = p2.archivos
+        .map((a) => `<tr><td><code>${escapar(a.archivo)}</code></td><td>${escapar(a.tipo)}</td>
     <td>${escapar(a.prueba)}</td><td class="num-col">${a.tests}</td><td>${a.dependencias}</td></tr>`).join("");
 
-ponerCodigo("cod-formula", p2.codigo_formula, "java");
-ponerCodigo("cod-mock", p2.codigo_mock, "java");
-ponerCodigo("cod-integracion", p2.codigo_integracion, "java");
+    ponerCodigo("cod-formula", p2.codigo_formula, "java");
+    ponerCodigo("cod-mock", p2.codigo_mock, "java");
+    ponerCodigo("cod-integracion", p2.codigo_integracion, "java");
 
-/* ------------------------------------------------------------ punto 3 */
-const ETIQUETA_POSTURA = {
-  excepciones: "excepciones",
-  compilador: "Result + compilador",
-  convencion: "error + convención",
-};
+    /* ------------------------------------------------------------ punto 3 */
+    const ETIQUETA_POSTURA = {
+        excepciones: "excepciones",
+        compilador: "Result + compilador",
+        convencion: "error + convención",
+    };
 
-let actual = 0;
-const pestanias = document.getElementById("pestanias");
-const panel = document.getElementById("panel");
+    let actual = 0;
+    const pestanias = document.getElementById("pestanias");
+    const panel = document.getElementById("panel");
 
-DATOS.lenguajes.forEach((l, i) => {
-  const b = document.createElement("button");
-  b.className = "pestania";
-  b.setAttribute("role", "tab");
-  b.setAttribute("aria-selected", String(i === 0));
-  b.innerHTML = `${escapar(l.nombre)} <span class="n">${l.tests}</span>`;
-  b.onclick = () => seleccionar(i);
-  pestanias.appendChild(b);
-});
+    DATOS.lenguajes.forEach((l, i) => {
+        const b = document.createElement("button");
+        b.className = "pestania";
+        b.setAttribute("role", "tab");
+        b.setAttribute("aria-selected", String(i === 0));
+        b.innerHTML = `${escapar(l.nombre)} <span class="n">${l.tests}</span>`;
+        b.onclick = () => seleccionar(i);
+        pestanias.appendChild(b);
+    });
 
-function seleccionar(i) {
-  actual = i;
-  [...pestanias.children].forEach((b, j) => b.setAttribute("aria-selected", String(i === j)));
-  const l = DATOS.lenguajes[i];
-  const f = l.funcional;
+    function seleccionar(i) {
+        actual = i;
+        [...pestanias.children].forEach((b, j) => b.setAttribute("aria-selected", String(i === j)));
+        const l = DATOS.lenguajes[i];
+        const f = l.funcional;
 
-  const lista = (items) => `<ul>${items.map((t) => `<li>${t}</li>`).join("")}</ul>`;
+        const lista = (items) => `<ul>${items.map((t) => `<li>${t}</li>`).join("")}</ul>`;
 
-  panel.innerHTML = `
+        panel.innerHTML = `
     <div class="ancho caja" style="padding:0">
       <div style="padding:18px 20px">
         <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:12px;margin-bottom:8px">
@@ -843,114 +1426,119 @@ function seleccionar(i) {
       <p class="bloque-titulo">La corrida <span class="cmd">${escapar(l.comando)}</span></p>
       <div id="term-lenguaje">${terminal({titulo: l.comando, texto: l.salida})}</div>
     </div>`;
-}
+    }
 
-seleccionar(0);
+    seleccionar(0);
 
-/* ------------------------------------------------------------ resultados */
-document.getElementById("tabla-resultados").innerHTML = DATOS.resultados
-  .map((r) => `<tr><td>${escapar(r.proyecto)}</td><td>${escapar(r.punto)}</td>
+    /* ------------------------------------------------------------ resultados */
+    document.getElementById("tabla-resultados").innerHTML = DATOS.resultados
+        .map((r) => `<tr><td>${escapar(r.proyecto)}</td><td>${escapar(r.punto)}</td>
     <td>${escapar(r.framework)}</td><td class="num-col">${r.tests}</td></tr>`).join("");
-document.getElementById("total-tests").textContent =
-  DATOS.resultados.reduce((a, r) => a + Number(r.tests), 0);
+    document.getElementById("total-tests").textContent =
+        DATOS.resultados.reduce((a, r) => a + Number(r.tests), 0);
 
-/* ------------------------------------------------------------ corrida real */
-const btnCorrer = document.getElementById("btn-correr");
-const estadoServidor = document.getElementById("estado-servidor");
-let motor = "local";
-let servidorVivo = false;
-let corriendo = false;
+    /* ------------------------------------------------------------ corrida real */
+    const btnCorrer = document.getElementById("btn-correr");
+    const estadoServidor = document.getElementById("estado-servidor");
+    let motor = "local";
+    let servidorVivo = false;
+    let corriendo = false;
 
-document.querySelectorAll("[data-motor]").forEach((b) => {
-  b.onclick = () => {
-    motor = b.dataset.motor;
-    document.querySelectorAll("[data-motor]").forEach((o) =>
-      o.setAttribute("aria-pressed", String(o.dataset.motor === motor)));
-  };
-});
-
-async function comprobarServidor() {
-  try {
-    const r = await fetch("api/estado", {cache: "no-store"});
-    const datos = await r.json();
-    servidorVivo = true;
-    estadoServidor.textContent = datos.docker
-      ? "Ejecución en vivo disponible"
-      : "Ejecución en vivo disponible · Docker no detectado";
-    if (!datos.docker) document.querySelector('[data-motor="docker"]').disabled = true;
-  } catch {
-    estadoServidor.textContent = "Mostrando las corridas registradas";
-    btnCorrer.disabled = true;
-    document.querySelectorAll("[data-motor]").forEach((b) => (b.disabled = true));
-  }
-}
-comprobarServidor();
-
-async function correr() {
-  if (!servidorVivo || corriendo) return;
-  const l = DATOS.lenguajes[actual];
-  const contenedor = document.getElementById("term-lenguaje");
-
-  corriendo = true;
-  btnCorrer.disabled = true;
-  btnCorrer.textContent = "⏳ Corriendo…";
-
-  const lineas = [];
-  const pintar = (insignia, etiqueta) => {
-    contenedor.innerHTML = terminal({
-      titulo: `${motor === "docker" ? "docker · " : ""}${l.comando}`,
-      texto: lineas.join("\n"), insignia, etiqueta,
+    document.querySelectorAll("[data-motor]").forEach((b) => {
+        b.onclick = () => {
+            motor = b.dataset.motor;
+            document.querySelectorAll("[data-motor]").forEach((o) =>
+                o.setAttribute("aria-pressed", String(o.dataset.motor === motor)));
+        };
     });
-    const pre = contenedor.querySelector("pre");
-    pre.scrollTop = pre.scrollHeight;
-  };
 
-  lineas.push(`$ ${motor === "docker" ? `docker compose run --rm ${l.id}` : l.comando}`);
-  pintar("corriendo", "corriendo…");
+    async function comprobarServidor() {
+        try {
+            const r = await fetch("api/estado", {cache: "no-store"});
+            const datos = await r.json();
+            servidorVivo = true;
+            estadoServidor.textContent = datos.docker
+                ? "Ejecución en vivo disponible"
+                : "Ejecución en vivo disponible · Docker no detectado";
+            if (!datos.docker) document.querySelector('[data-motor="docker"]').disabled = true;
+        } catch {
+            estadoServidor.textContent = "Mostrando las corridas registradas";
+            btnCorrer.disabled = true;
+            document.querySelectorAll("[data-motor]").forEach((b) => (b.disabled = true));
+        }
+    }
 
-  const fuente = new EventSource(`api/correr?suite=${encodeURIComponent(l.id)}&motor=${motor}`);
+    comprobarServidor();
 
-  fuente.addEventListener("linea", (e) => {
-    lineas.push(JSON.parse(e.data).texto);
-    pintar("corriendo", "corriendo…");
-  });
+    async function correr() {
+        if (!servidorVivo || corriendo) return;
+        const l = DATOS.lenguajes[actual];
+        const contenedor = document.getElementById("term-lenguaje");
 
-  fuente.addEventListener("fin", (e) => {
-    const {codigo, segundos} = JSON.parse(e.data);
-    lineas.push("", codigo === 0
-      ? `✔ terminó sin fallos (código ${codigo}) en ${segundos}s`
-      : `✘ terminó con código ${codigo} en ${segundos}s`);
-    pintar(codigo === 0 ? "vivo" : "error", codigo === 0 ? "corrida en vivo" : "falló");
-    cerrar();
-  });
+        corriendo = true;
+        btnCorrer.disabled = true;
+        btnCorrer.textContent = "⏳ Corriendo…";
 
-  fuente.addEventListener("fallo", (e) => {
-    lineas.push("", `✘ ${JSON.parse(e.data).mensaje}`);
-    pintar("error", "error");
-    cerrar();
-  });
+        const lineas = [];
+        const pintar = (insignia, etiqueta) => {
+            contenedor.innerHTML = terminal({
+                titulo: `${motor === "docker" ? "docker · " : ""}${l.comando}`,
+                texto: lineas.join("\n"), insignia, etiqueta,
+            });
+            const pre = contenedor.querySelector("pre");
+            pre.scrollTop = pre.scrollHeight;
+        };
 
-  fuente.onerror = () => {
-    if (corriendo) { lineas.push("", "✘ se cortó la conexión con el servidor"); pintar("error", "error"); cerrar(); }
-  };
+        lineas.push(`$ ${motor === "docker" ? `docker compose run --rm ${l.id}` : l.comando}`);
+        pintar("corriendo", "corriendo…");
 
-  function cerrar() {
-    fuente.close();
-    corriendo = false;
-    btnCorrer.disabled = false;
-    btnCorrer.textContent = "▶ Correr esta suite";
-  }
-}
+        const fuente = new EventSource(`api/correr?suite=${encodeURIComponent(l.id)}&motor=${motor}`);
 
-btnCorrer.onclick = correr;
+        fuente.addEventListener("linea", (e) => {
+            lineas.push(JSON.parse(e.data).texto);
+            pintar("corriendo", "corriendo…");
+        });
 
-/* ------------------------------------------------------------ teclado */
-document.addEventListener("keydown", (e) => {
-  if (e.target.matches("input, textarea")) return;
-  if (e.key === "ArrowRight") seleccionar((actual + 1) % DATOS.lenguajes.length);
-  if (e.key === "ArrowLeft") seleccionar((actual - 1 + DATOS.lenguajes.length) % DATOS.lenguajes.length);
-  if (e.key === "r" || e.key === "R") correr();
-});
+        fuente.addEventListener("fin", (e) => {
+            const {codigo, segundos} = JSON.parse(e.data);
+            lineas.push("", codigo === 0
+                ? `✔ terminó sin fallos (código ${codigo}) en ${segundos}s`
+                : `✘ terminó con código ${codigo} en ${segundos}s`);
+            pintar(codigo === 0 ? "vivo" : "error", codigo === 0 ? "corrida en vivo" : "falló");
+            cerrar();
+        });
+
+        fuente.addEventListener("fallo", (e) => {
+            lineas.push("", `✘ ${JSON.parse(e.data).mensaje}`);
+            pintar("error", "error");
+            cerrar();
+        });
+
+        fuente.onerror = () => {
+            if (corriendo) {
+                lineas.push("", "✘ se cortó la conexión con el servidor");
+                pintar("error", "error");
+                cerrar();
+            }
+        };
+
+        function cerrar() {
+            fuente.close();
+            corriendo = false;
+            btnCorrer.disabled = false;
+            btnCorrer.textContent = "▶ Correr esta suite";
+        }
+    }
+
+    btnCorrer.onclick = correr;
+
+    /* ------------------------------------------------------------ teclado */
+    document.addEventListener("keydown", (e) => {
+        if (e.target.matches("input, textarea")) return;
+        if (e.key === "ArrowRight") seleccionar((actual + 1) % DATOS.lenguajes.length);
+        if (e.key === "ArrowLeft") seleccionar((actual - 1 + DATOS.lenguajes.length) % DATOS.lenguajes.length);
+        if (e.key === "r" || e.key === "R") correr();
+    });
 </script>
 </body>
 </html>

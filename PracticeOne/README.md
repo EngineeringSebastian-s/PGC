@@ -13,12 +13,12 @@ Realizar los ejercicios que están en las siguientes páginas tal cual están ah
 
 ## Qué hay en cada carpeta
 
-| Carpeta                   | Punto | Contenido                                                     |
-|---------------------------|-------|---------------------------------------------------------------|
-| [`p1-java/`](p1-java)     | 1 y 2 | JUnit 5 (`Calculator`) + ecuación de primer grado con Mockito |
-| [`p1-kotlin/`](p1-kotlin) | 1     | El mismo ejercicio de JUnit 5, en Kotlin                      |
-| [`crud-tdd/`](crud-tdd)   | 3     | Seis CRUD con TDD: C#, Python, React, PHP, Rust y Go          |
-| [`guia-web/`](guia-web)   | 1 y 2 | Guía interactiva para proyectar durante la exposición         |
+| Carpeta                                           | Punto    | Contenido                                                                             |
+|---------------------------------------------------|----------|---------------------------------------------------------------------------------------|
+| [`p1-java/`](p1-java)                             | 1 y 2    | JUnit 5 (`Calculator`) + ecuación de primer grado con Mockito                         |
+| [`p1-kotlin/`](p1-kotlin)                         | 1        | El mismo ejercicio de JUnit 5, en Kotlin                                              |
+| [`crud-tdd/`](crud-tdd)                           | 3        | Seis CRUD con TDD: C#, Python, React, PHP, Rust y Go                                  |
+| [`guia-web/`](guia-web)                           | 1 y 2    | Guía interactiva para proyectar durante la exposición                                 |
 | [`crud-tdd/presentacion/`](crud-tdd/presentacion) | 1, 2 y 3 | Página para proyectar la práctica completa: consigna, TDD, código, tests y resultados |
 
 Cada carpeta tiene su propio README con los requisitos, el detalle de los tests y las notas técnicas.
